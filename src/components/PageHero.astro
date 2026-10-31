@@ -76,8 +76,10 @@ const trail: Crumb[] | undefined = crumbs && [{ label: 'Home', href: routes.home
 		background-image: radial-gradient(circle at 75% 40%, #e6eff8 0, var(--photo-3) 55%);
 		color: var(--white);
 	}
+	/* Fill the screen; svh keeps it steady as mobile browser bars show and hide */
 	.hero--home {
-		min-height: 760px;
+		min-height: 100vh;
+		min-height: 100svh;
 		display: flex;
 		flex-direction: column;
 		background-image: radial-gradient(circle at 72% 40%, #e6eff8 0, var(--photo-3) 55%);
@@ -184,8 +186,9 @@ const trail: Crumb[] | undefined = crumbs && [{ label: 'Home', href: routes.home
 		.hero--home .hero-shade {
 			background: linear-gradient(180deg, rgba(36, 59, 88, 0.95) 0%, rgba(44, 72, 106, 0.9) 70%, rgba(60, 96, 138, 0.75) 100%);
 		}
+		/* Stop above the sticky mobile action bar */
 		.hero--home {
-			min-height: 0;
+			min-height: calc(100svh - 68px - env(safe-area-inset-bottom));
 		}
 	}
 </style>
