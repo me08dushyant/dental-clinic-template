@@ -1,0 +1,63 @@
+---
+import Footer from '../components/Footer.astro';
+import MobileActions from '../components/MobileActions.astro';
+import { site } from '../data/site';
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const { title, description = `Gentle family dentistry in ${site.city}.` } = Astro.props;
+
+// schema.org Dentist data so search results can show hours, phone and rating
+const structuredData = {
+	'@context': 'https://schema.org',
+	'@type': 'Dentist',
+	name: site.name,
+	description,
+	url: site.url,
+	telephone: site.phoneHref.replace('tel:', ''),
+	address: {
+		'@type': 'PostalAddress',
+		streetAddress: site.street || undefined,
+		addressLocality: site.city,
+		postalCode: site.postalCode || undefined,
+		addressCountry: 'IN',
+	},
+	openingHoursSpecification: site.schedule.map((s) => ({
+		'@type': 'OpeningHoursSpecification',
+		dayOfWeek: s.days,
+		opens: s.opens,
+		closes: s.closes,
+	})),
+	aggregateRating: site.rating.value
+		? { '@type': 'AggregateRating', ratingValue: site.rating.value, reviewCount: site.rating.count }
+		: undefined,
+};
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content={description} />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="generator" content={Astro.generator} />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" />
+		<title>{title}</title>
+		<script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+	</head>
+	<body>
+		<a href="#main" class="skip-link">Skip to content</a>
+		<main id="main" tabindex="-1">
+			<slot />
+		</main>
+		<Footer />
+		<MobileActions />
+	</body>
+</html>

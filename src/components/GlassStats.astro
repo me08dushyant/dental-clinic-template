@@ -1,0 +1,74 @@
+---
+// Frosted stats strip that sits on the bottom-right edge of a photo hero.
+interface Props {
+	items: { value: string; label: string }[];
+	maxWidth?: string;
+	size?: 'lg' | 'md';
+}
+
+const { items, maxWidth = '900px', size = 'lg' } = Astro.props;
+---
+
+<div class="wrap">
+	<dl class:list={['stats', `stats--${size}`]} style={{ flexBasis: maxWidth }}>
+		{
+			items.map((item) => (
+				<div>
+					<dt>{item.label}</dt>
+					<dd>{item.value}</dd>
+				</div>
+			))
+		}
+	</dl>
+</div>
+
+<style>
+	.wrap {
+		position: relative;
+		z-index: 1;
+		display: flex;
+		justify-content: flex-end;
+	}
+	.stats {
+		flex: 0 1 900px;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+		background: rgba(255, 255, 255, 0.14);
+		backdrop-filter: blur(14px);
+		-webkit-backdrop-filter: blur(14px);
+		border-top: 1px solid rgba(255, 255, 255, 0.45);
+		border-left: 1px solid rgba(255, 255, 255, 0.45);
+		border-radius: 18px 0 0 0;
+		color: var(--white);
+	}
+	.stats > div {
+		padding: 28px 20px;
+		text-align: center;
+		display: flex;
+		flex-direction: column-reverse;
+	}
+	.stats--md > div {
+		padding-block: 26px;
+	}
+	dt {
+		font-size: 13px;
+		color: #e3ecf6;
+	}
+	dd {
+		font-size: 44px;
+		font-weight: 700;
+		line-height: 1.1;
+	}
+	.stats--md dd {
+		font-size: 40px;
+	}
+	@media (max-width: 560px) {
+		.stats {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+		dd,
+		.stats--md dd {
+			font-size: 32px;
+		}
+	}
+</style>

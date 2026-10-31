@@ -1,0 +1,150 @@
+---
+// Full-bleed photo hero with the gradient overlay and the site header on top.
+import Header, { type NavKey } from './Header.astro';
+import { routes } from '../data/site';
+import type { SitePhoto } from '../data/photos';
+
+interface Crumb {
+	label: string;
+	href?: string;
+}
+
+interface Props {
+	title: string;
+	titleId?: string;
+	lead?: string;
+	photo: SitePhoto;
+	/** CSS object-position for the photo; the subject should sit on the right, clear of the text. */
+	photoPosition?: string;
+	active?: NavKey;
+	bookHref?: string;
+	crumbs?: Crumb[];
+	/** Bottom padding of the text block (room for an overlapping card below). */
+	padBottom?: string;
+	wideTitle?: boolean;
+	home?: boolean;
+}
+
+const {
+	title,
+	titleId = 'page-title',
+	lead,
+	photo,
+	photoPosition = 'center',
+	active,
+	bookHref,
+	crumbs,
+	padBottom = '96px',
+	wideTitle = false,
+	home = false,
+} = Astro.props;
+
+const trail: Crumb[] | undefined = crumbs && [{ label: 'Home', href: routes.home }, ...crumbs];
+---
+
+<section aria-labelledby={titleId} class:list={['hero', { 'hero--home': home }]}>
+	<img class="hero-photo" src={photo.src} alt={photo.alt} fetchpriority="high" decoding="async" style={{ objectPosition: photoPosition }} />
+	<div aria-hidden="true" class="hero-shade"></div>
+	<Header active={active} bookHref={bookHref} />
+	<div class="container hero-body" style={{ paddingBottom: padBottom }}>
+		<slot name="top" />
+		{
+			trail && (
+				<nav aria-label="Breadcrumb" class="crumbs">
+					{trail.map((c, i) => (
+						<>
+							{i > 0 && <span aria-hidden="true">/</span>}
+							{c.href ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}
+						</>
+					))}
+				</nav>
+			)
+		}
+		<h1 id={titleId} class:list={['hero-title', { 'hero-title--wide': wideTitle }]}>{title}</h1>
+		{lead && <p class="hero-lead">{lead}</p>}
+		<slot />
+	</div>
+	<slot name="after" />
+</section>
+
+<style>
+	.hero {
+		position: relative;
+		background-color: var(--photo-3);
+		background-image: radial-gradient(circle at 75% 40%, #e6eff8 0, var(--photo-3) 55%);
+		color: var(--white);
+	}
+	.hero--home {
+		min-height: 760px;
+		display: flex;
+		flex-direction: column;
+		background-image: radial-gradient(circle at 72% 40%, #e6eff8 0, var(--photo-3) 55%);
+	}
+	.hero-photo {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.hero-shade {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(90deg, rgba(36, 59, 88, 0.97) 0%, rgba(44, 72, 106, 0.9) 38%, rgba(60, 96, 138, 0.35) 68%, rgba(201, 218, 236, 0) 90%);
+	}
+	.hero--home .hero-shade {
+		background: linear-gradient(90deg, rgba(36, 59, 88, 0.97) 0%, rgba(44, 72, 106, 0.88) 32%, rgba(60, 96, 138, 0.35) 62%, rgba(201, 218, 236, 0) 85%);
+	}
+	.hero-body {
+		position: relative;
+		z-index: 1;
+		padding-top: 56px;
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+	}
+	.hero--home .hero-body {
+		flex: 1;
+		width: 100%;
+		padding-top: 40px;
+		gap: 40px;
+	}
+	.crumbs {
+		font-size: 14px;
+		color: var(--on-dark);
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+	.crumbs a {
+		color: var(--white);
+	}
+	.hero-title {
+		font-weight: 700;
+		font-size: clamp(42px, 5vw, 68px);
+		line-height: 1.05;
+		letter-spacing: -0.02em;
+		max-width: 11em;
+	}
+	.hero-title--wide {
+		max-width: none;
+	}
+	.hero--home .hero-title {
+		font-size: clamp(44px, 5.6vw, 76px);
+	}
+	.hero-lead {
+		color: var(--on-dark);
+		max-width: 32em;
+	}
+
+	/* On narrow screens the text spans the full width, so darken the whole photo */
+	@media (max-width: 760px) {
+		.hero-shade,
+		.hero--home .hero-shade {
+			background: linear-gradient(180deg, rgba(36, 59, 88, 0.95) 0%, rgba(44, 72, 106, 0.9) 70%, rgba(60, 96, 138, 0.75) 100%);
+		}
+		.hero--home {
+			min-height: 0;
+		}
+	}
+</style>

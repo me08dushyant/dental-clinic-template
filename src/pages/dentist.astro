@@ -1,0 +1,250 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import IconCard from '../components/IconCard.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Photo from '../components/Photo.astro';
+import { routes, site } from '../data/site';
+import { photos } from '../data/photos';
+
+const chips = ['[15+] years experience', 'Speaks [English, Hindi]', 'Great with kids & anxious patients'];
+
+const career = [
+	{ year: '[Year]', title: 'BDS', where: '[Dental College, University]' },
+	{ year: '[Year]', title: 'MDS, [Specialisation]', where: '[Dental College, University]' },
+	{ year: '[Year]', title: '[Role], [Hospital]', where: '[What they did there]' },
+	{ year: '[Year] – now', title: `Founder, ${site.name}`, where: 'Family, cosmetic & restorative care', featured: true },
+];
+
+const expertise = [
+	{ icon: 'rootCanal', title: 'Painless root canals' },
+	{ icon: 'implant', title: 'Dental implants' },
+	{ icon: 'smile', title: "Children's dentistry", featured: true },
+	{ icon: 'whitening', title: 'Smile design' },
+	{ icon: 'aligners', title: 'Clear aligners' },
+	{ icon: 'heart', title: 'Anxious patients' },
+] as const;
+
+const memberships = ['[Indian Dental Association]', '[State Dental Council registration]', '[Specialist society]'];
+const education = ['[Implantology certification, Year]', '[Aligner provider certification, Year]', '[Conference or workshop, Year]'];
+---
+
+<BaseLayout title={`Meet Our Dentist — ${site.name}`}>
+	<PageHero
+		title="Dr. [Full Name]"
+		photo={photos.heroDentist}
+		photoPosition="center 30%"
+		active="dentist"
+		crumbs={[{ label: 'Our Dentist' }]}
+		wideTitle
+	>
+		<p class="quals">BDS, MDS ([Specialisation]) · Reg. No. [XXXXX]</p>
+		<ul class="chips">
+			{chips.map((c) => <li class="glass-chip glass-chip--static">{c}</li>)}
+		</ul>
+	</PageHero>
+
+	<section aria-labelledby="bio-title" class="section">
+		<div aria-hidden="true" class="blob blob--right"></div>
+		<div class="container split">
+			<div class="bio">
+				<p class="eyebrow">About the doctor</p>
+				<h2 id="bio-title" class="h2">Calm, precise and always honest about your options</h2>
+				<p class="muted">[2–3 sentence bio: where Dr. [Name] trained, what they focus on, and what patients appreciate about them.]</p>
+				<p class="muted">[One more line about their approach, e.g. preferring to save natural teeth and explaining every step before starting.]</p>
+				<a href={routes.contact} class="btn btn--blue bio-btn">Book with Dr. [Name]</a>
+			</div>
+			<Photo label="Photo · Dr. [Name] explaining an X-ray" photo={photos.dentistXray} height="460px" class="bio-photo" />
+		</div>
+	</section>
+
+	<section aria-labelledby="edu-title" class="section bg-soft">
+		<div class="container stack">
+			<div class="section-head section-head--center">
+				<p class="eyebrow">Qualifications</p>
+				<h2 id="edu-title" class="h2">Education &amp; Experience</h2>
+			</div>
+			<ol class="career">
+				{
+					career.map((c) => (
+						<li class:list={{ featured: c.featured }}>
+							<span class="pill">{c.year}</span>
+							<h3>{c.title}</h3>
+							<p>{c.where}</p>
+						</li>
+					))
+				}
+			</ol>
+		</div>
+	</section>
+
+	<section aria-labelledby="focus-title" class="section">
+		<div class="container stack">
+			<div class="section-head section-head--center">
+				<p class="eyebrow">Special interests</p>
+				<h2 id="focus-title" class="h2">Areas of Expertise</h2>
+			</div>
+			<div class="card-grid">
+				{expertise.map((e) => <IconCard icon={e.icon} title={e.title} featured={'featured' in e && e.featured} />)}
+			</div>
+		</div>
+	</section>
+
+	<section aria-label="Philosophy" class="section section--flush-top">
+		<div class="container">
+			<figure class="panel-dark quote">
+				<svg aria-hidden="true" width="48" height="36" viewBox="0 0 48 36" fill="#8FB5DE"
+					><path d="M0 36V20C0 9 6 2 18 0l2 5c-7 2-10 6-10 11h9v20H0zm27 0V20C27 9 33 2 45 0l2 5c-7 2-10 6-10 11h9v20H27z"></path></svg
+				>
+				<blockquote>
+					[The dentist's philosophy in their own words, e.g. the best treatment is the one a patient fully understands and feels ready for.]
+				</blockquote>
+				<figcaption>Dr. [Full Name], Founder</figcaption>
+			</figure>
+		</div>
+	</section>
+
+	<section aria-labelledby="member-title" class="section bg-soft">
+		<div class="container lists">
+			<div class="list-card">
+				<h2 id="member-title">Memberships</h2>
+				<ul>{memberships.map((m) => <li>{m}</li>)}</ul>
+			</div>
+			<div class="list-card">
+				<h2>Continuing education</h2>
+				<ul>{education.map((e) => <li>{e}</li>)}</ul>
+			</div>
+		</div>
+	</section>
+
+	<CtaBand
+		title="Meet Dr. [Name] in person"
+		text="Your first consultation includes a full check-up and a clear plan."
+		primary={{ label: 'Book consultation', href: routes.contact }}
+		secondary={{ label: 'WhatsApp us', href: site.whatsapp }}
+	/>
+</BaseLayout>
+
+<style>
+	.quals {
+		color: var(--on-dark);
+		font-size: 19px;
+	}
+	.chips {
+		margin: 8px 0 0;
+		padding: 0;
+		list-style: none;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+	}
+
+	.bio {
+		flex: 1 1 460px;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+	.bio-btn {
+		align-self: flex-start;
+		margin-top: 8px;
+	}
+	.split :global(.bio-photo) {
+		flex: 1 1 400px;
+	}
+
+	.career {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+		gap: 20px;
+	}
+	.career li {
+		padding: 28px;
+		border-radius: 16px;
+		background: var(--white);
+		border: 1px solid var(--line);
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+	.career h3 {
+		font-size: 20px;
+		font-weight: 700;
+	}
+	.career p {
+		color: var(--muted);
+		font-size: 16px;
+	}
+	.career li.featured {
+		background: var(--blue);
+		border-color: var(--blue);
+		color: var(--white);
+		box-shadow: var(--shadow-blue);
+	}
+	.career li.featured .pill {
+		background: var(--white);
+	}
+	.career li.featured p {
+		color: var(--on-blue);
+	}
+
+	.card-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+		gap: 20px;
+	}
+
+	.quote {
+		padding: clamp(40px, 6vw, 88px);
+		display: flex;
+		flex-direction: column;
+		gap: 28px;
+	}
+	.quote blockquote {
+		font-size: clamp(24px, 2.8vw, 38px);
+		font-weight: 600;
+		line-height: 1.3;
+		max-width: 30em;
+	}
+	.quote figcaption {
+		color: var(--on-dark-2);
+	}
+
+	.lists {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+		gap: 20px;
+	}
+	.list-card {
+		padding: 36px;
+		border-radius: 16px;
+		background: var(--white);
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+	}
+	.list-card h2 {
+		font-size: 26px;
+		font-weight: 700;
+	}
+	.list-card ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		color: var(--body-2);
+	}
+	.list-card li {
+		display: flex;
+		gap: 12px;
+	}
+	.list-card li::before {
+		content: '●';
+		color: var(--blue);
+	}
+</style>

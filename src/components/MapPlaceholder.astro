@@ -1,0 +1,43 @@
+---
+// Stand-in for the Google Maps embed. Swap the inner markup for the real <iframe>.
+interface Props {
+	minHeight?: string;
+	class?: string;
+}
+
+const { minHeight = '420px', class: className } = Astro.props;
+---
+
+<div class:list={['map', className]} style={{ minHeight }} role="img" aria-label="Google Maps embed placeholder">
+	<span class="pin-label"><span class="pin"></span>Google Maps embed</span>
+</div>
+
+<style>
+	.map {
+		border-radius: 18px;
+		background-color: var(--photo-2);
+		background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+		background-size: 52px 52px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.pin-label {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 10px;
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--photo-text);
+	}
+	.pin {
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		background: var(--blue);
+		box-shadow: 0 0 0 10px rgba(46, 116, 192, 0.2);
+	}
+</style>

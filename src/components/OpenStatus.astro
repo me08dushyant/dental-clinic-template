@@ -1,0 +1,89 @@
+---
+// "Open now / Closed" pill computed in the browser from site.schedule, in the clinic's time zone.
+import { site } from '../data/site';
+
+interface Props {
+	class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<span class:list={['open-status', className]} data-open-status data-schedule={JSON.stringify(site.schedule)} data-tz={site.timeZone} hidden>
+	<span aria-hidden="true" class="dot"></span><span data-open-text></span>
+</span>
+
+<script>
+	const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+	type Slot = { days: string[]; opens: string; closes: string };
+
+	const toMinutes = (hhmm: string) => {
+		const [h, m] = hhmm.split(':').map(Number);
+		return h * 60 + m;
+	};
+
+	for (const el of document.querySelectorAll<HTMLElement>('[data-open-status]')) {
+		const schedule: Slot[] = JSON.parse(el.dataset.schedule ?? '[]');
+		const parts = new Intl.DateTimeFormat('en-GB', {
+			timeZone: el.dataset.tz,
+			weekday: 'long',
+			hour: '2-digit',
+			minute: '2-digit',
+			hourCycle: 'h23',
+		}).formatToParts(new Date());
+		const get = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
+		const today = DAYS.indexOf(get('weekday'));
+		const now = Number(get('hour')) * 60 + Number(get('minute'));
+		const slotFor = (day: number) => schedule.find((s) => s.days.includes(DAYS[day]));
+
+		const current = slotFor(today);
+		let text: string;
+		let open = false;
+		if (current && now >= toMinutes(current.opens) && now < toMinutes(current.closes)) {
+			open = true;
+			text = `Open now · until ${current.closes}`;
+		} else {
+			// Next opening: later today, or the first open day after
+			text = 'Closed now';
+			for (let i = 0; i < 7; i++) {
+				const slot = slotFor((today + i) % 7);
+				if (!slot || (i === 0 && now >= toMinutes(slot.opens))) continue;
+				const when = i === 0 ? 'today' : i === 1 ? 'tomorrow' : DAYS[(today + i) % 7];
+				text = `Closed now · opens ${when} ${slot.opens}`;
+				break;
+			}
+		}
+
+		el.querySelector('[data-open-text]')!.textContent = text;
+		el.classList.toggle('is-open', open);
+		el.hidden = false;
+	}
+</script>
+
+<style>
+	.open-status {
+		align-self: flex-start;
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 6px 14px;
+		border-radius: 999px;
+		background: #fdf0e3;
+		color: #8a4b12;
+		font-size: 14px;
+		font-weight: 700;
+	}
+	.open-status[hidden] {
+		display: none;
+	}
+	.dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: currentColor;
+	}
+	.open-status.is-open {
+		background: #e3f4ea;
+		color: #1d6b3f;
+	}
+</style>

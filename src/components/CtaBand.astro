@@ -1,0 +1,60 @@
+---
+// Full-width blue call-to-action band that closes each page.
+interface Action {
+	label: string;
+	href: string;
+}
+
+interface Props {
+	title: string;
+	text: string;
+	primary: Action;
+	secondary?: Action;
+}
+
+const { title, text, primary, secondary } = Astro.props;
+---
+
+<section aria-labelledby="cta-title" class="band">
+	<div class="container inner">
+		<div class="copy">
+			<h2 id="cta-title" class="title">{title}</h2>
+			<p class="text">{text}</p>
+		</div>
+		<div class="btn-row">
+			<a href={primary.href} class="btn btn--lg btn--white">{primary.label}</a>
+			{secondary && <a href={secondary.href} class="btn btn--lg btn--outline-white">{secondary.label}</a>}
+		</div>
+	</div>
+</section>
+
+<style>
+	.band {
+		background: var(--blue);
+		color: var(--white);
+	}
+	.inner {
+		padding-block: clamp(56px, 7vw, 88px);
+		display: flex;
+		flex-wrap: wrap;
+		gap: 24px 48px;
+		align-items: center;
+		justify-content: space-between;
+	}
+	.copy {
+		flex: 1 1 480px;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+	.title {
+		font-weight: 700;
+		font-size: clamp(32px, 3.6vw, 48px);
+		line-height: 1.1;
+	}
+	.text {
+		color: var(--on-blue);
+		font-size: 18px;
+	}
+</style>

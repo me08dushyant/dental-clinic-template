@@ -1,0 +1,299 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import IconCard from '../components/IconCard.astro';
+import CtaBand from '../components/CtaBand.astro';
+import Photo from '../components/Photo.astro';
+import { routes, site } from '../data/site';
+import { photos } from '../data/photos';
+
+const facts = [
+	{ value: '[2011]', label: 'caring since' },
+	{ value: '[2]', label: 'treatment rooms' },
+	{ value: '[6]', label: 'care team members' },
+	{ value: '[10K+]', label: 'happy patients' },
+];
+
+const steps = [
+	{ title: 'Listen', text: 'Your concerns, history and any worries about treatment.' },
+	{ title: 'Examine', text: 'A thorough check with digital X-rays when needed.' },
+	{ title: 'Explain', text: 'Options, timelines and a written cost estimate.', featured: true },
+	{ title: 'Treat gently', text: "Only when you're ready, at a pace that feels right." },
+];
+
+const facilities = [
+	{ icon: 'xray', title: 'Digital X-ray (RVG)', text: 'Instant images, far less radiation' },
+	{ icon: 'camera', title: 'Intraoral camera', text: 'See your teeth on screen' },
+	{ icon: 'shield', title: 'Class B autoclave', text: 'Hospital-grade sterilisation' },
+	{ icon: 'chair', title: 'Ergonomic chairs', text: 'Comfort through longer visits' },
+	{ icon: 'smile', title: "Kids' corner", text: 'Books, toys, a calm waiting space' },
+	{ icon: 'access', title: 'Accessible clinic', text: '[Lift / ground floor, parking]' },
+] as const;
+
+const hygiene = ['Ultrasonic cleaning', 'Sealed in sterile pouches', 'Autoclaved at 134°C', 'Opened in front of you'];
+
+const gallery = [
+	{ label: 'Treatment room', photo: photos.treatmentRoom, tall: true },
+	{ label: 'Reception', photo: photos.reception },
+	{ label: 'Sterilisation room', photo: photos.sterilisation },
+	{ label: 'Consultation room', photo: photos.consultation },
+	{ label: "Kids' corner", photo: photos.kidsDentist },
+];
+---
+
+<BaseLayout title={`About the Clinic — ${site.name}`}>
+	<PageHero
+		title="A family clinic built on trust."
+		lead="Since [Year], we've cared for children, parents and grandparents in [Area, City] with the same patience and honesty."
+		photo={photos.heroAbout}
+		padBottom="140px"
+		active="about"
+		crumbs={[{ label: 'About' }]}
+	/>
+
+	<div class="container facts-wrap">
+		<dl class="facts">
+			{
+				facts.map((f) => (
+					<div>
+						<dt>{f.label}</dt>
+						<dd>{f.value}</dd>
+					</div>
+				))
+			}
+		</dl>
+	</div>
+
+	<section aria-labelledby="story-title" class="section">
+		<div aria-hidden="true" class="blob blob--left"></div>
+		<div class="container split">
+			<Photo label="Photo · Founder with the care team" photo={photos.founderTeam} height="420px" class="story-photo" />
+			<div class="story-copy">
+				<p class="eyebrow">Our story</p>
+				<h2 id="story-title" class="h2">Dental visits shouldn't feel stressful</h2>
+				<p class="muted">[Tell the clinic's origin in 2–3 sentences: who founded it, when, and what they wanted to do differently for patients.]</p>
+				<p class="muted">Today many of our patients started as children and now bring their own kids. Keeping that trust is the thing we work hardest at.</p>
+			</div>
+		</div>
+	</section>
+
+	<section aria-labelledby="approach-title" class="section bg-soft">
+		<div class="container stack">
+			<div class="section-head section-head--center">
+				<p class="eyebrow">Our approach</p>
+				<h2 id="approach-title" class="h2">Every Visit, Four Simple Steps</h2>
+			</div>
+			<ol class="steps">
+				{
+					steps.map((s, i) => (
+						<li class:list={{ featured: s.featured }}>
+							<span class="num-badge">{i + 1}</span>
+							<h3>{s.title}</h3>
+							<p>{s.text}</p>
+						</li>
+					))
+				}
+			</ol>
+		</div>
+	</section>
+
+	<section aria-labelledby="tech-title" class="section">
+		<div class="container stack">
+			<div class="section-head section-head--center">
+				<p class="eyebrow">Facilities &amp; technology</p>
+				<h2 id="tech-title" class="h2">Equipped for Precise, Gentle Care</h2>
+			</div>
+			<div class="card-grid">
+				{facilities.map((f) => <IconCard icon={f.icon} title={f.title} text={f.text} />)}
+			</div>
+		</div>
+	</section>
+
+	<section aria-labelledby="hyg-title" class="section section--flush-top">
+		<div class="container">
+			<div class="panel-dark hygiene">
+				<div class="hygiene-head">
+					<p class="eyebrow">Hygiene protocol</p>
+					<h2 id="hyg-title" class="h2 h2--sm">Sterilisation you can see</h2>
+					<p class="hygiene-note">Ask us for a tour of the sterilisation room. We're proud of it.</p>
+				</div>
+				<ol class="hygiene-steps">
+					{
+						hygiene.map((h, i) => (
+							<li>
+								<span class="hygiene-n">{i + 1}</span>
+								{h}
+							</li>
+						))
+					}
+				</ol>
+			</div>
+		</div>
+	</section>
+
+	<section aria-labelledby="gal-title" class="section bg-soft">
+		<div class="container stack" style="--stack-gap: 40px">
+			<div class="section-head">
+				<p class="eyebrow">Inside the clinic</p>
+				<h2 id="gal-title" class="h2">Clean, Calm and Modern</h2>
+			</div>
+			<div class="gallery">
+				{gallery.map((g) => <Photo label={g.label} photo={g.photo} caption radius="16px" class={g.tall ? 'tall' : undefined} />)}
+			</div>
+		</div>
+	</section>
+
+	<CtaBand
+		title="Come see the clinic for yourself"
+		text="Book a consultation and we'll show you around."
+		primary={{ label: 'Book appointment', href: routes.contact }}
+		secondary={{ label: 'WhatsApp us', href: site.whatsapp }}
+	/>
+</BaseLayout>
+
+<style>
+	.facts-wrap {
+		position: relative;
+		z-index: 2;
+		margin-top: -64px;
+	}
+	.facts {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
+		background: var(--white);
+		border-radius: 16px;
+		border: 1px solid var(--line-2);
+		box-shadow: var(--shadow-card);
+		overflow: hidden;
+	}
+	.facts > div {
+		padding: 28px;
+		text-align: center;
+		display: flex;
+		flex-direction: column-reverse;
+		/* The 1px outline draws a divider on every side, so wrapped rows stay separated too */
+		box-shadow: -1px 0 0 var(--line-2), 0 -1px 0 var(--line-2);
+	}
+	.facts dt {
+		font-size: 14px;
+		color: var(--muted);
+	}
+	.facts dd {
+		font-size: 40px;
+		font-weight: 700;
+		color: var(--blue);
+		line-height: 1.1;
+	}
+
+	.split :global(.story-photo) {
+		flex: 1 1 420px;
+	}
+	.story-copy {
+		flex: 1 1 460px;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+
+	.steps {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+		gap: 20px;
+	}
+	.steps li {
+		padding: 32px 28px;
+		border-radius: 16px;
+		background: var(--white);
+		border: 1px solid var(--line);
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+	.steps h3 {
+		font-size: 21px;
+		font-weight: 700;
+	}
+	.steps p {
+		color: var(--muted);
+		font-size: 16px;
+	}
+	.steps li.featured {
+		background: var(--blue);
+		border-color: var(--blue);
+		color: var(--white);
+		box-shadow: var(--shadow-blue);
+	}
+	.steps li.featured .num-badge {
+		background: var(--white);
+	}
+	.steps li.featured p {
+		color: var(--on-blue);
+	}
+
+	.card-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+		gap: 20px;
+	}
+
+	.hygiene {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 40px 64px;
+		align-items: center;
+	}
+	.hygiene-head {
+		flex: 1 1 340px;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+	}
+	.hygiene-head .eyebrow {
+		color: var(--accent-light);
+	}
+	.hygiene-note {
+		color: var(--on-dark-2);
+	}
+	.hygiene-steps {
+		flex: 1.4 1 480px;
+		min-width: 0;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+		gap: 14px;
+	}
+	.hygiene-steps li {
+		display: flex;
+		gap: 14px;
+		align-items: center;
+		padding: 18px;
+		border-radius: 12px;
+		background: var(--navy-card);
+	}
+	.hygiene-n {
+		flex: 0 0 32px;
+		height: 32px;
+		border-radius: 50%;
+		background: var(--blue);
+		font-weight: 800;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.gallery {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+		grid-auto-rows: 230px;
+		gap: 16px;
+	}
+	.gallery :global(.tall) {
+		grid-row: span 2;
+	}
+</style>

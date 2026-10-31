@@ -1,0 +1,215 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import BeforeAfter from '../../components/BeforeAfter.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Icon from '../../components/Icon.astro';
+import { bookFor, routes, site } from '../../data/site';
+import { photos, smileCases } from '../../data/photos';
+
+const options = [
+	{ icon: 'whitening', title: 'Teeth whitening', text: 'In-clinic whitening that lifts years of stains in one visit, plus take-home trays.', detail: '[1 visit · 60–90 min]' },
+	{ icon: 'veneer', title: 'Porcelain veneers', text: 'Thin custom shells that fix chips, gaps, shape and deep discolouration.', detail: '[2–3 visits]', featured: true },
+	{ icon: 'smileDesign', title: 'Digital smile design', text: 'We plan your new smile on screen first, so you see the result before treatment.', detail: '[Planning + treatment]' },
+	{ icon: 'bonding', title: 'Composite bonding', text: 'Tooth-coloured resin sculpted onto teeth. A quick fix for small chips and gaps.', detail: '[1 visit]' },
+] as const;
+
+const cases = [
+	{ label: 'Whitening', meta: '[1 visit]', pair: smileCases.whitening },
+	{ label: 'Veneers', meta: '[3 visits]', pair: smileCases.veneers },
+	{ label: 'Bonding', meta: '[1 visit]', pair: smileCases.bonding },
+];
+
+const process = [
+	{ title: 'Consultation', text: "Tell us what you'd like to change. We check tooth and gum health first." },
+	{ title: 'Digital preview', text: 'Photos and a mock-up show the result before we touch a tooth.' },
+	{ title: 'Treatment', text: 'One to three comfortable visits, depending on your choice.', featured: true },
+	{ title: 'Aftercare', text: 'A follow-up check and tips to keep your smile bright.' },
+];
+---
+
+<BaseLayout title={`Cosmetic Dentistry — ${site.name}`}>
+	<PageHero
+		title="A smile that still looks like you."
+		lead="Whitening, veneers and smile design, planned around your face and natural shade."
+		photo={photos.heroCosmetic}
+		photoPosition="right center"
+		active="services"
+		crumbs={[{ label: 'Treatments', href: routes.services }, { label: 'Cosmetic' }]}
+	>
+		<a href={bookFor('cosmetic')} class="btn btn--blue hero-btn">Book a smile consultation</a>
+	</PageHero>
+
+	<section aria-labelledby="opt-title" class="section">
+		<div class="container stack">
+			<div class="section-head section-head--center">
+				<p class="eyebrow">Cosmetic treatments</p>
+				<h2 id="opt-title" class="h2">Choose Your Smile Upgrade</h2>
+			</div>
+			<div class="options">
+				{
+					options.map((o) => (
+						<article class:list={['option', { featured: 'featured' in o && o.featured }]}>
+							<Icon name={o.icon} size={44} />
+							<div class="option-body">
+								<h3>{o.title}</h3>
+								<p>{o.text}</p>
+								<span class="detail">{o.detail}</span>
+							</div>
+						</article>
+					))
+				}
+			</div>
+		</div>
+	</section>
+
+	<section aria-labelledby="ba-title" class="section bg-soft">
+		<div class="container stack" style="--stack-gap: 40px">
+			<div class="heading-row">
+				<div class="section-head">
+					<p class="eyebrow">Smile results</p>
+					<h2 id="ba-title" class="h2">Before &amp; After</h2>
+				</div>
+				<a href={routes.reviews} class="text-link">Full smile gallery →</a>
+			</div>
+			<div class="cases">
+				{cases.map((c) => <BeforeAfter label={c.label} meta={c.meta} pair={c.pair} />)}
+			</div>
+			<p class="muted consent">Sample images for illustration. Replace with the clinic's own cases, shared with each patient's written consent.</p>
+		</div>
+	</section>
+
+	<section aria-labelledby="proc-title" class="section">
+		<div class="container stack" style="--stack-gap: 56px">
+			<div class="section-head section-head--center">
+				<p class="eyebrow">How it works</p>
+				<h2 id="proc-title" class="h2">From First Chat to Final Smile</h2>
+			</div>
+			<ol class="process">
+				{
+					process.map((p, i) => (
+						<li class:list={{ featured: p.featured }}>
+							<span class="step-n">{i + 1}</span>
+							<h3>{p.title}</h3>
+							<p>{p.text}</p>
+						</li>
+					))
+				}
+			</ol>
+		</div>
+	</section>
+
+	<CtaBand
+		title="See your new smile before you commit"
+		text="Book a smile consultation with Dr. [Name]."
+		primary={{ label: 'Book consultation', href: bookFor('cosmetic') }}
+		secondary={{ label: 'WhatsApp us', href: site.whatsapp }}
+	/>
+</BaseLayout>
+
+<style>
+	.hero-btn {
+		align-self: flex-start;
+		margin-top: 8px;
+	}
+
+	.options {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+		gap: 20px;
+	}
+	.option {
+		padding: clamp(24px, 3vw, 36px);
+		border: 1px solid var(--line);
+		border-radius: 16px;
+		display: flex;
+		gap: 24px;
+		align-items: flex-start;
+	}
+	.option :global(svg) {
+		flex: 0 0 44px;
+		color: var(--blue);
+	}
+	.option-body {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+	.option h3 {
+		font-size: 24px;
+		font-weight: 700;
+	}
+	.option p {
+		color: var(--muted);
+	}
+	.detail {
+		font-size: 15px;
+		font-weight: 700;
+		color: var(--blue);
+	}
+	.option.featured {
+		background: var(--blue);
+		border-color: var(--blue);
+		color: var(--white);
+		box-shadow: var(--shadow-blue);
+	}
+	.option.featured :global(svg),
+	.option.featured .detail {
+		color: var(--white);
+	}
+	.option.featured p {
+		color: var(--on-blue);
+	}
+
+	.cases {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr));
+		gap: 20px;
+	}
+	.consent {
+		font-size: 14px;
+	}
+
+	.process {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+		gap: 32px;
+	}
+	.process li {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		text-align: center;
+		gap: 12px;
+	}
+	.step-n {
+		width: 64px;
+		height: 64px;
+		border-radius: 50%;
+		background: var(--tint);
+		color: var(--blue);
+		font-size: 22px;
+		font-weight: 800;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border: 6px solid var(--white);
+		box-shadow: 0 0 0 1px var(--line);
+	}
+	.process li.featured .step-n {
+		background: var(--blue);
+		color: var(--white);
+		box-shadow: 0 0 0 1px var(--blue);
+	}
+	.process h3 {
+		font-size: 20px;
+		font-weight: 700;
+	}
+	.process p {
+		color: var(--muted);
+		font-size: 16px;
+	}
+</style>

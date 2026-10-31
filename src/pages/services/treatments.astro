@@ -1,0 +1,337 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Photo from '../../components/Photo.astro';
+import Icon from '../../components/Icon.astro';
+import { routes, site } from '../../data/site';
+import { photos } from '../../data/photos';
+
+const jumpLinks = [
+	{ href: '#rct', label: 'Root canal' },
+	{ href: '#implants', label: 'Implants' },
+	{ href: '#crowns', label: 'Crowns & bridges' },
+	{ href: '#braces', label: 'Braces & aligners' },
+];
+
+const stages = [
+	{ stage: 'STAGE 1 · DAY 1', title: 'Planning & placement', text: 'X-ray assessment, then the implant is placed under local anaesthesia.' },
+	{ stage: 'STAGE 2 · [3–6 MONTHS]', title: 'Healing', text: 'The bone bonds with the implant. A temporary tooth can be fitted.', featured: true },
+	{ stage: 'STAGE 3 · FINAL VISIT', title: 'Your new crown', text: 'A custom crown is fixed in place, matched to your other teeth.' },
+];
+
+const braces = [
+	{ label: 'Visibility', metal: 'Visible', ceramic: 'Subtle', aligners: 'Nearly invisible' },
+	{ label: 'Removable', metal: 'No', ceramic: 'No', aligners: 'Yes' },
+	{ label: 'Best for', metal: 'Complex cases, teens', ceramic: 'Adults wanting discretion', aligners: 'Mild to moderate crowding' },
+	{ label: 'Duration', metal: '[18–24 months]', ceramic: '[18–24 months]', aligners: '[9–18 months]' },
+];
+---
+
+<BaseLayout title={`Dental Treatments — ${site.name}`}>
+	<PageHero
+		title="Restore, replace and straighten."
+		lead="Root canals, implants, crowns and braces, explained clearly and done gently."
+		photo={photos.heroTreatments}
+		active="services"
+		crumbs={[{ label: 'Treatments', href: routes.services }, { label: 'Restorative' }]}
+	>
+		<nav aria-label="On this page" class="jump">
+			{jumpLinks.map((l) => <a href={l.href} class="glass-chip">{l.label}</a>)}
+		</nav>
+	</PageHero>
+
+	<section id="rct" aria-labelledby="rct-title" class="section">
+		<div aria-hidden="true" class="blob blob--left rct-blob"></div>
+		<div class="container split">
+			<Photo label="Photo · Root canal consultation" photo={photos.rootCanalConsult} height="440px" class="rct-photo" />
+			<div class="rct-copy">
+				<p class="eyebrow">01 · Root canal treatment</p>
+				<h2 id="rct-title" class="h2">Save the Tooth, Stop the Pain</h2>
+				<p class="muted">When decay reaches the nerve, we remove the infection, clean the canals and seal them. Most patients leave with relief, not pain.</p>
+				<div class="rct-lists">
+					<div class="rct-list rct-list--outline">
+						<strong>Signs you may need one</strong>
+						<ul>
+							<li>Lingering pain to hot or cold</li>
+							<li>Pain when biting</li>
+							<li>Swelling near a tooth</li>
+						</ul>
+					</div>
+					<div class="rct-list rct-list--soft">
+						<strong>What to expect</strong>
+						<ul>
+							<li>Local anaesthesia</li>
+							<li>[1–2] visits of [45–60 min]</li>
+							<li>A crown to protect it</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section id="implants" aria-labelledby="imp-title" class="section bg-soft">
+		<div class="container stack">
+			<div class="section-head section-head--center">
+				<p class="eyebrow">02 · Dental implants</p>
+				<h2 id="imp-title" class="h2">A Permanent Tooth That Feels Natural</h2>
+				<p class="muted imp-text">A titanium post replaces the root, then a natural-looking crown sits on top. No slipping, no harm to neighbouring teeth.</p>
+			</div>
+			<ol class="stages">
+				{
+					stages.map((s) => (
+						<li class:list={{ featured: s.featured }}>
+							<span class="stage">{s.stage}</span>
+							<h3>{s.title}</h3>
+							<p>{s.text}</p>
+						</li>
+					))
+				}
+			</ol>
+		</div>
+	</section>
+
+	<section id="crowns" aria-labelledby="crown-title" class="section">
+		<div class="container stack" style="--stack-gap: 40px">
+			<div class="section-head">
+				<p class="eyebrow">03 · Crowns &amp; bridges</p>
+				<h2 id="crown-title" class="h2">Strengthen a Tooth or Bridge a Gap</h2>
+			</div>
+			<div class="crowns">
+				<article class="crown">
+					<Icon name="crown" size={44} />
+					<div class="crown-body">
+						<h3>Crown</h3>
+						<p class="muted">A cap that restores the shape and strength of a damaged or root-canal-treated tooth.</p>
+						<p class="spec"><strong>Materials:</strong> zirconia, E-max, PFM · <strong>Visits:</strong> [2]</p>
+					</div>
+				</article>
+				<article class="crown">
+					<Icon name="bridge" size={44} />
+					<div class="crown-body">
+						<h3>Bridge</h3>
+						<p class="muted">A fixed row of connected crowns that fills a gap, anchored to the teeth on either side.</p>
+						<p class="spec"><strong>Best when:</strong> neighbours need crowns · <strong>Visits:</strong> [2–3]</p>
+					</div>
+				</article>
+			</div>
+		</div>
+	</section>
+
+	<section id="braces" aria-labelledby="braces-title" class="section section--flush-top">
+		<div class="container">
+			<div class="panel-dark braces">
+				<div class="heading-row">
+					<div class="section-head">
+						<p class="eyebrow eyebrow--light">04 · Braces &amp; aligners</p>
+						<h2 id="braces-title" class="h2 h2--sm">Straighter Teeth at Any Age</h2>
+					</div>
+					<p class="braces-note">We'll help you choose based on your bite, lifestyle and budget.</p>
+				</div>
+				<div class="table-wrap">
+					<table>
+						<thead>
+							<tr>
+								<th scope="col"><span class="sr-only">Feature</span></th>
+								<th scope="col" class="col">Metal braces</th>
+								<th scope="col" class="col">Ceramic braces</th>
+								<th scope="col" class="col hl hl--top">Clear aligners</th>
+							</tr>
+						</thead>
+						<tbody>
+							{
+								braces.map((row, i) => (
+									<tr>
+										<th scope="row">{row.label}</th>
+										<td>{row.metal}</td>
+										<td>{row.ceramic}</td>
+										<td class:list={['hl', { 'hl--bottom': i === braces.length - 1 }]}>{row.aligners}</td>
+									</tr>
+								))
+							}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<CtaBand
+		title="In pain right now?"
+		text="Call us. We keep same-day slots for dental emergencies."
+		primary={{ label: `Call ${site.phoneDisplay}`, href: site.phoneHref }}
+		secondary={{ label: 'Book online', href: routes.contact }}
+	/>
+</BaseLayout>
+
+<style>
+	.jump {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		margin-top: 8px;
+	}
+
+	.rct-blob {
+		width: 540px;
+		height: 500px;
+	}
+	.split :global(.rct-photo) {
+		flex: 1 1 400px;
+	}
+	.rct-copy {
+		flex: 1.2 1 480px;
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+	}
+	.rct-lists {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+		gap: 16px;
+	}
+	.rct-list {
+		padding: 22px;
+		border-radius: 12px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+	.rct-list--outline {
+		border: 1px solid var(--line);
+	}
+	.rct-list--soft {
+		background: var(--soft);
+	}
+	.rct-list ul {
+		margin: 0;
+		padding-left: 18px;
+		color: var(--muted);
+		font-size: 16px;
+	}
+
+	.imp-text {
+		max-width: 36em;
+	}
+	.stages {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+		gap: 20px;
+	}
+	.stages li {
+		padding: 32px;
+		border-radius: 16px;
+		background: var(--white);
+		border: 1px solid var(--line);
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+	.stage {
+		font-size: 14px;
+		font-weight: 700;
+		color: var(--blue);
+	}
+	.stages h3 {
+		font-size: 22px;
+		font-weight: 700;
+	}
+	.stages p {
+		color: var(--muted);
+		font-size: 16px;
+	}
+	.stages li.featured {
+		background: var(--blue);
+		border-color: var(--blue);
+		color: var(--white);
+		box-shadow: var(--shadow-blue);
+	}
+	.stages li.featured .stage,
+	.stages li.featured p {
+		color: var(--on-blue);
+	}
+
+	.crowns {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(380px, 100%), 1fr));
+		gap: 20px;
+	}
+	.crown {
+		padding: clamp(24px, 3vw, 36px);
+		border: 1px solid var(--line);
+		border-radius: 16px;
+		display: flex;
+		gap: 24px;
+		align-items: flex-start;
+	}
+	.crown :global(svg) {
+		flex: 0 0 44px;
+		color: var(--blue);
+	}
+	.crown-body {
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+	.crown h3 {
+		font-size: 24px;
+		font-weight: 700;
+	}
+	.spec {
+		font-size: 15px;
+	}
+
+	.braces {
+		padding: clamp(32px, 5vw, 64px);
+		display: flex;
+		flex-direction: column;
+		gap: 32px;
+	}
+	.braces-note {
+		color: var(--on-dark-2);
+		max-width: 26em;
+	}
+	.table-wrap {
+		overflow-x: auto;
+	}
+	table {
+		width: 100%;
+		min-width: 680px;
+		border-collapse: separate;
+		border-spacing: 0;
+		text-align: left;
+	}
+	th,
+	td {
+		padding: 16px 20px;
+		border-bottom: 1px solid var(--navy-line);
+	}
+	tbody tr:last-child th,
+	tbody tr:last-child td {
+		border-bottom: 0;
+	}
+	thead th.col {
+		font-size: 19px;
+	}
+	tbody {
+		font-size: 16px;
+	}
+	tbody th {
+		color: var(--on-dark-2);
+		font-weight: 600;
+	}
+	.hl {
+		background: var(--blue);
+		border-bottom-color: #5b8cc6;
+	}
+	.hl--top {
+		border-radius: 12px 12px 0 0;
+	}
+	.hl--bottom {
+		border-radius: 0 0 12px 12px;
+	}
+</style>

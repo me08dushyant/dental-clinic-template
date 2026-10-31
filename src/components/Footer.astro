@@ -1,0 +1,95 @@
+---
+import Icon from './Icon.astro';
+import { routes, site } from '../data/site';
+---
+
+<footer class="footer">
+	<div class="container inner">
+		<div class="cols">
+			<div class="col col--brand">
+				<span class="brand"><Icon name="tooth" size={24} strokeWidth={1.7} />{site.name}</span>
+				<span>Gentle family dentistry in {site.city}.</span>
+			</div>
+			<nav aria-label="Clinic" class="col">
+				<span class="heading">Clinic</span>
+				<a href={routes.about}>About</a>
+				<a href={routes.dentist}>Our dentist</a>
+				<a href={routes.reviews}>Reviews</a>
+				<a href={routes.contact}>Contact</a>
+			</nav>
+			<nav aria-label="Treatments" class="col">
+				<span class="heading">Treatments</span>
+				<a href={routes.general}>General dentistry</a>
+				<a href={routes.cosmetic}>Cosmetic dentistry</a>
+				<a href={`${routes.treatments}#implants`}>Implants &amp; RCT</a>
+				<a href={`${routes.treatments}#braces`}>Braces &amp; aligners</a>
+			</nav>
+			<div class="col">
+				<span class="heading">Contact</span>
+				<span>{site.addressShort}</span>
+				<a href={site.phoneHref} class="phone">{site.phoneDisplay}</a>
+				<span>{site.hoursShort}</span>
+			</div>
+		</div>
+		<div class="legal">
+			<span>© {new Date().getFullYear()} {site.name}. All rights reserved.</span>
+			<span>{site.registration}</span>
+		</div>
+	</div>
+</footer>
+
+<style>
+	.footer {
+		background: var(--footer);
+		color: var(--footer-text);
+		font-size: 15px;
+	}
+	.inner {
+		padding-block: 64px 32px;
+		display: flex;
+		flex-direction: column;
+		gap: 48px;
+	}
+	.cols {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+		gap: 32px;
+	}
+	.col {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+	.col--brand {
+		gap: 12px;
+	}
+	.brand {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		color: var(--white);
+		font-weight: 700;
+		font-size: 20px;
+	}
+	.heading {
+		color: var(--white);
+		font-weight: 700;
+	}
+	.col a {
+		color: var(--footer-text);
+		text-decoration: none;
+	}
+	.col a:hover,
+	.col a.phone {
+		color: var(--white);
+	}
+	.legal {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		gap: 12px;
+		padding-top: 24px;
+		border-top: 1px solid var(--footer-line);
+		font-size: 14px;
+	}
+</style>

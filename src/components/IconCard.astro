@@ -1,0 +1,90 @@
+---
+// Bordered card with a line icon and a title; `featured` fills it with blue.
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props {
+	icon: IconName;
+	title: string;
+	text?: string;
+	href?: string;
+	featured?: boolean;
+	tall?: boolean;
+}
+
+const { icon, title, text, href, featured = false, tall = false } = Astro.props;
+const Tag = href ? 'a' : 'div';
+---
+
+<Tag href={href} class:list={['card', { featured, tall, link: href }]}>
+	<Icon name={icon} size={40} />
+	{
+		text ? (
+			<span class="body">
+				<strong class="title">{title}</strong>
+				<span class="text">{text}</span>
+			</span>
+		) : (
+			<span class="title title--plain" set:html={title} />
+		)
+	}
+</Tag>
+
+<style>
+	.card {
+		display: flex;
+		align-items: center;
+		gap: 22px;
+		min-height: 110px;
+		padding: 24px 32px;
+		border: 1px solid var(--line);
+		border-radius: 12px;
+		background: var(--white);
+		color: var(--ink);
+		text-decoration: none;
+		transition:
+			border-color 0.15s ease,
+			transform 0.15s ease;
+	}
+	.card.tall {
+		min-height: 124px;
+	}
+	.card :global(svg) {
+		flex: none;
+		color: var(--blue);
+	}
+	.card.link:hover {
+		border-color: var(--blue);
+		color: var(--ink);
+		transform: translateY(-2px);
+	}
+	.card.featured {
+		background: var(--blue);
+		border-color: var(--blue);
+		color: var(--white);
+		box-shadow: var(--shadow-blue);
+	}
+	.card.featured :global(svg) {
+		color: var(--white);
+	}
+	.card.featured.link:hover {
+		color: var(--white);
+	}
+	.body {
+		display: flex;
+		flex-direction: column;
+	}
+	.title {
+		font-size: 19px;
+	}
+	.title--plain {
+		font-weight: 600;
+		line-height: 1.3;
+	}
+	.text {
+		font-size: 15px;
+		color: var(--muted);
+	}
+	.featured .text {
+		color: var(--on-blue);
+	}
+</style>

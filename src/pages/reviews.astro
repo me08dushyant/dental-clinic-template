@@ -1,0 +1,151 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import GlassStats from '../components/GlassStats.astro';
+import ReviewCard from '../components/ReviewCard.astro';
+import BeforeAfter from '../components/BeforeAfter.astro';
+import { routes, site } from '../data/site';
+import { photos, smileCases } from '../data/photos';
+
+const ratings = [
+	{ value: '[4.9★]', label: 'Google rating' },
+	{ value: '[000]', label: 'Google reviews' },
+	{ value: '[4.8★]', label: '[Practo] rating' },
+];
+
+const reviews = [
+	{ quote: '[Longer featured review from Google, ideally about overcoming dental anxiety.]', name: '[Patient name]', meta: '[Treatment] · [Month Year]', tone: 'blue', featured: true },
+	{ quote: "[Short review about a child's first visit.]", name: '[Parent name]', meta: "Kids' dentistry", tone: 'soft' },
+	{ quote: '[Review about root canal treatment and how quickly the pain went away.]', name: '[Patient name]', meta: 'Root canal', tone: 'outline' },
+	{ quote: '[Review mentioning how clean the clinic is.]', name: '[Patient name]', meta: 'Cleaning', tone: 'outline' },
+	{ quote: '[Review about dental implants and the final result.]', name: '[Patient name]', meta: 'Implants', tone: 'navy' },
+	{ quote: '[Review about whitening or veneers.]', name: '[Patient name]', meta: 'Cosmetic', tone: 'soft' },
+	{ quote: '[Review about clear explanations and transparent pricing.]', name: '[Patient name]', meta: 'Consultation', tone: 'outline' },
+] as const;
+
+const results = [
+	{ label: 'Whitening', pair: smileCases.whitening },
+	{ label: 'Veneers', pair: smileCases.veneers },
+	{ label: 'Clear aligners', pair: smileCases.aligners },
+	{ label: 'Dental implant', pair: smileCases.implant },
+	{ label: 'Bonding', pair: smileCases.bonding },
+	{ label: 'Crowns', pair: smileCases.crowns },
+];
+---
+
+<BaseLayout title={`Patient Reviews — ${site.name}`}>
+	<PageHero
+		title="In our patients' words."
+		lead="Real reviews from families we care for, shared on Google and [Practo]."
+		photo={photos.heroReviews}
+		photoPosition="70% 35%"
+		padBottom="48px"
+		active="reviews"
+		crumbs={[{ label: 'Reviews' }]}
+	>
+		<GlassStats slot="after" items={ratings} maxWidth="760px" size="md" />
+	</PageHero>
+
+	<section aria-labelledby="list-title" class="section">
+		<div class="container stack" style="--stack-gap: 40px">
+			<div class="section-head section-head--center">
+				<p class="eyebrow">Testimonials</p>
+				<h2 id="list-title" class="h2">What Our Patients Say</h2>
+			</div>
+			<div class="masonry">
+				{reviews.map((r) => <ReviewCard quote={r.quote} name={r.name} meta={r.meta} tone={r.tone} featured={'featured' in r && r.featured} />)}
+			</div>
+			<a href={site.googleReviews} class="btn btn--outline-blue more">Read more on Google</a>
+		</div>
+	</section>
+
+	<section aria-labelledby="gal-title" class="section bg-soft">
+		<div class="container stack" style="--stack-gap: 40px">
+			<div class="heading-row">
+				<div class="section-head">
+					<p class="eyebrow">Smile gallery</p>
+					<h2 id="gal-title" class="h2">Before &amp; After Results</h2>
+				</div>
+				<p class="muted consent">Sample images for illustration. Replace with the clinic's own cases, shared with each patient's written consent.</p>
+			</div>
+			<div class="results">
+				{results.map((r) => <BeforeAfter label={r.label} pair={r.pair} height="170px" />)}
+			</div>
+		</div>
+	</section>
+
+	<section aria-labelledby="leave-title" class="section">
+		<div class="container ctas">
+			<div class="cta-card cta-card--dark">
+				<h2 id="leave-title" class="cta-title">Ready for your own result?</h2>
+				<p>Start with a check-up and a clear plan.</p>
+				<a href={routes.contact} class="btn btn--white dark-btn">Book appointment</a>
+			</div>
+			<div class="cta-card cta-card--outline">
+				<h2 class="cta-title">Already a patient?</h2>
+				<p class="muted">A quick review helps other families find gentle dental care.</p>
+				<a href={site.googleReviews} class="btn btn--blue">Leave a Google review</a>
+			</div>
+		</div>
+	</section>
+</BaseLayout>
+
+<style>
+	.masonry {
+		columns: 3 320px;
+		column-gap: 20px;
+	}
+	.masonry > :global(figure) {
+		break-inside: avoid;
+		margin-bottom: 20px;
+	}
+	.more {
+		align-self: center;
+	}
+
+	.consent {
+		font-size: 15px;
+		max-width: 28em;
+	}
+	.results {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+		gap: 20px;
+	}
+	.results :global(.case) {
+		padding: 12px;
+		gap: 12px;
+	}
+
+	.ctas {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr));
+		gap: 20px;
+	}
+	.cta-card {
+		padding: clamp(32px, 4vw, 48px);
+		border-radius: 20px;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		align-items: flex-start;
+	}
+	.cta-card--dark {
+		background: var(--navy);
+		color: var(--white);
+	}
+	.cta-card--dark p {
+		color: var(--on-dark-2);
+	}
+	.cta-card--outline {
+		border: 1px solid var(--line);
+	}
+	.cta-title {
+		font-weight: 700;
+		font-size: clamp(26px, 2.8vw, 36px);
+		line-height: 1.15;
+	}
+	.dark-btn {
+		color: var(--navy);
+	}
+</style>

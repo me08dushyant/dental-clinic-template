@@ -1,0 +1,59 @@
+---
+// Sticky Call / WhatsApp / Book bar, shown on phones only.
+import Icon from './Icon.astro';
+import { routes, site } from '../data/site';
+---
+
+<nav aria-label="Quick contact" class="mobile-actions">
+	<a href={site.phoneHref} class="action"><Icon name="phone" size={20} strokeWidth={1.8} />Call</a>
+	<a href={site.whatsapp} class="action"><Icon name="whatsapp" size={20} strokeWidth={1.8} />WhatsApp</a>
+	<a href={`${routes.contact}#book`} class="action action--primary">Book visit</a>
+</nav>
+
+<style>
+	.mobile-actions {
+		display: none;
+	}
+	@media (max-width: 760px) {
+		.mobile-actions {
+			position: fixed;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			z-index: 20;
+			display: grid;
+			grid-template-columns: 1fr 1fr 1.2fr;
+			gap: 8px;
+			padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+			background: var(--white);
+			border-top: 1px solid var(--line-2);
+			box-shadow: 0 -10px 30px -18px rgba(31, 59, 91, 0.5);
+		}
+	}
+	.action {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		min-height: 48px;
+		border-radius: 10px;
+		border: 1.5px solid var(--line);
+		color: var(--ink);
+		font-weight: 700;
+		font-size: 15px;
+		text-decoration: none;
+	}
+	.action:hover {
+		color: var(--ink);
+		background: var(--soft);
+	}
+	.action--primary {
+		border-color: var(--blue);
+		background: var(--blue);
+		color: var(--white);
+	}
+	.action--primary:hover {
+		background: var(--blue-dark);
+		color: var(--white);
+	}
+</style>

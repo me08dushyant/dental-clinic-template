@@ -1,0 +1,487 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import MapPlaceholder from '../components/MapPlaceholder.astro';
+import Icon from '../components/Icon.astro';
+import OpenStatus from '../components/OpenStatus.astro';
+import { site } from '../data/site';
+import { photos } from '../data/photos';
+
+const reasons = ['Check-up & cleaning', 'Tooth pain', 'Root canal', 'Implants', 'Braces / aligners', 'Whitening / cosmetic', "Child's visit", 'Other'];
+const slots = ['Morning', 'Afternoon', 'Evening'];
+const hours = [
+	['Mon – Fri', '[10:00 – 20:00]'],
+	['Saturday', '[10:00 – 18:00]'],
+	['Sunday', '[Emergencies only]'],
+];
+---
+
+<BaseLayout title={`Contact & Appointment — ${site.name}`}>
+	<PageHero
+		title="Book your visit."
+		lead="Fill in the form, WhatsApp us, or just call. We confirm every request within [2 hours]."
+		photo={photos.heroContact}
+		padBottom="160px"
+		active="contact"
+		bookHref="#book"
+		crumbs={[{ label: 'Contact' }]}
+	/>
+
+	<section id="book" aria-label="Booking" class="book">
+		<div class="container book-grid">
+			<div class="form-card">
+				<div class="success" role="status" tabindex="-1" hidden data-success>
+					<span class="success-icon"><Icon name="check" size={30} strokeWidth={2.4} /></span>
+					<h2 class="success-title">Request received</h2>
+					<p class="muted">Thank you. Our front desk will call or WhatsApp you shortly to confirm your appointment.</p>
+					<button type="button" class="btn btn--md btn--outline-blue" data-reset>Send another request</button>
+				</div>
+
+				<form class="form" data-booking-form>
+					<div class="form-head">
+						<p class="eyebrow">Appointment</p>
+						<h2 class="form-title">Request a time</h2>
+					</div>
+					<div class="fields">
+						<div class="field">
+							<label for="f-name">Full name</label>
+							<input id="f-name" name="name" type="text" required autocomplete="name" />
+						</div>
+						<div class="field">
+							<label for="f-phone">Mobile number</label>
+							<input id="f-phone" name="phone" type="tel" required autocomplete="tel" inputmode="tel" pattern="[0-9+\s\-]{10,15}" title="10-digit mobile number" placeholder="+91" />
+						</div>
+						<div class="field">
+							<label for="f-treat">Reason for visit</label>
+							<select id="f-treat" name="reason">
+								{reasons.map((r) => <option>{r}</option>)}
+							</select>
+						</div>
+						<div class="field">
+							<label for="f-date">Preferred date</label>
+							<input id="f-date" name="date" type="date" />
+						</div>
+					</div>
+					<fieldset class="slots">
+						<legend>Preferred time</legend>
+						<div class="slot-row">
+							{
+								slots.map((s, i) => (
+									<label class="slot">
+										<input type="radio" name="slot" value={s} checked={i === 0} />
+										{s}
+									</label>
+								))
+							}
+						</div>
+					</fieldset>
+					<div class="field">
+						<label for="f-msg">Anything we should know? <span class="optional">(optional)</span></label>
+						<textarea id="f-msg" name="message" rows="4"></textarea>
+					</div>
+					<label class="consent">
+						<input type="checkbox" required />
+						I agree to be contacted by phone or WhatsApp about my appointment.
+					</label>
+					<button type="submit" class="btn btn--lg btn--blue btn--shadow submit">Request appointment</button>
+				</form>
+			</div>
+
+			<aside aria-label="Other ways to reach us" class="aside">
+				<a href={site.whatsapp} class="wa">
+					<span class="wa-head"><span class="wa-icon"><Icon name="whatsapp" size={24} strokeWidth={1.8} /></span><span class="wa-title">Book on WhatsApp</span></span>
+					<span class="wa-text">Fastest way. Send your name, day and reason for visit.</span>
+					<strong>{site.phoneDisplay}</strong>
+				</a>
+				<div class="details">
+					<div class="detail">
+						<span class="detail-icon"><Icon name="phone" size={20} strokeWidth={1.8} /></span>
+						<span class="detail-text"><span>Call us</span><a href={site.phoneHref}>{site.phoneDisplay}</a></span>
+					</div>
+					<div class="detail">
+						<span class="detail-icon"><Icon name="mail" size={20} strokeWidth={1.8} /></span>
+						<span class="detail-text"><span>Email</span><a href={site.emailHref}>{site.email}</a></span>
+					</div>
+					<div class="hours">
+						<span class="hours-label">Opening hours</span>
+						<OpenStatus />
+						{
+							hours.map(([day, time]) => (
+								<div class="hour">
+									<span>{day}</span>
+									<strong>{time}</strong>
+								</div>
+							))
+						}
+					</div>
+				</div>
+				<div class="emergency">
+					<strong>Dental emergency?</strong>
+					<span>Call directly for same-day help with pain, swelling or a broken tooth.</span>
+				</div>
+			</aside>
+		</div>
+	</section>
+
+	<section aria-labelledby="loc-title" class="section bg-soft">
+		<div class="container location">
+			<div class="loc-card">
+				<p class="eyebrow">Location</p>
+				<h2 id="loc-title" class="loc-title">Find the Clinic</h2>
+				<p class="address">[Building name, Floor]<br />[Street], [Area]<br />{site.city} – [PIN]</p>
+				<ul class="loc-list">
+					<li>Landmark: [Near ...]</li>
+					<li>Parking: [Available]</li>
+					<li>Access: [Lift / ground floor]</li>
+				</ul>
+				<a href={site.maps} class="btn btn--blue directions">Get directions</a>
+			</div>
+			<MapPlaceholder minHeight="460px" class="loc-map" />
+		</div>
+	</section>
+</BaseLayout>
+
+<script>
+	// Front-end only: swaps the form for a confirmation. Wire the submit to your booking backend.
+	const form = document.querySelector<HTMLFormElement>('[data-booking-form]');
+	const success = document.querySelector<HTMLElement>('[data-success]');
+	const reset = document.querySelector<HTMLButtonElement>('[data-reset]');
+
+	// No past dates in the picker (local date, not UTC)
+	const date = document.querySelector<HTMLInputElement>('#f-date');
+	if (date) {
+		const now = new Date();
+		date.min = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+	}
+
+	// Treatment pages can link here with ?reason=Implants to preselect the reason
+	const reason = new URLSearchParams(location.search).get('reason');
+	const select = document.querySelector<HTMLSelectElement>('#f-treat');
+	if (reason && select) {
+		const match = [...select.options].find((o) => o.value.toLowerCase().includes(reason.toLowerCase()));
+		if (match) select.value = match.value;
+	}
+
+	if (form && success && reset) {
+		form.addEventListener('submit', (event) => {
+			event.preventDefault();
+			form.hidden = true;
+			success.hidden = false;
+			success.focus();
+		});
+		reset.addEventListener('click', () => {
+			form.reset();
+			success.hidden = true;
+			form.hidden = false;
+		});
+	}
+</script>
+
+<style>
+	.book {
+		position: relative;
+		z-index: 2;
+		margin-top: -110px;
+		padding-bottom: var(--section-y);
+	}
+	.book-grid {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 20px;
+		align-items: flex-start;
+	}
+	.form-card {
+		flex: 1.6 1 560px;
+		min-width: 0;
+		padding: clamp(24px, 4vw, 48px);
+		border-radius: 20px;
+		background: var(--white);
+		border: 1px solid var(--line-2);
+		box-shadow: 0 30px 60px -36px rgba(31, 59, 91, 0.5);
+	}
+
+	.success {
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+		align-items: flex-start;
+		padding: 32px 0;
+		outline: none;
+	}
+	.success[hidden],
+	.form[hidden] {
+		display: none;
+	}
+	.success-icon {
+		width: 64px;
+		height: 64px;
+		border-radius: 50%;
+		background: var(--tint);
+		color: var(--blue);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.success-title {
+		font-size: 32px;
+		font-weight: 700;
+	}
+	.success p {
+		max-width: 32em;
+	}
+
+	.form {
+		display: flex;
+		flex-direction: column;
+		gap: 20px;
+	}
+	.form-head {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+	.form-title {
+		font-size: 30px;
+		font-weight: 700;
+	}
+	.fields {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+		gap: 16px;
+	}
+	.field {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+	.field label,
+	.slots legend {
+		font-size: 15px;
+		font-weight: 600;
+	}
+	.optional {
+		font-weight: 400;
+		color: var(--muted);
+	}
+	.field input,
+	.field select,
+	.field textarea {
+		min-height: 52px;
+		padding: 0 16px;
+		border-radius: 10px;
+		border: 1px solid var(--field);
+		background: var(--field-bg);
+	}
+	.field textarea {
+		padding: 14px 16px;
+		resize: vertical;
+	}
+	.field input:focus,
+	.field select:focus,
+	.field textarea:focus {
+		outline: 2px solid var(--blue);
+		outline-offset: 1px;
+		border-color: var(--blue);
+	}
+	.slots {
+		margin: 0;
+		padding: 0;
+		border: 0;
+	}
+	.slots legend {
+		padding: 0;
+		margin-bottom: 10px;
+	}
+	.slot-row {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+	}
+	.slot {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		min-height: 46px;
+		padding: 0 18px;
+		border-radius: 10px;
+		border: 1px solid var(--field);
+		cursor: pointer;
+	}
+	.slot:has(input:checked) {
+		border-color: var(--blue);
+		background: var(--tint);
+	}
+	.slot input,
+	.consent input {
+		accent-color: var(--blue);
+	}
+	.consent {
+		display: flex;
+		gap: 10px;
+		align-items: flex-start;
+		font-size: 15px;
+		color: var(--muted);
+	}
+	.consent input {
+		flex: none;
+		width: 20px;
+		height: 20px;
+		margin-top: 2px;
+	}
+	.submit {
+		align-self: flex-start;
+		padding-inline: 32px;
+		font-size: 17px;
+	}
+
+	.aside {
+		flex: 1 1 340px;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+	.wa {
+		padding: 28px;
+		border-radius: 20px;
+		background: var(--blue);
+		color: var(--white);
+		text-decoration: none;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		box-shadow: var(--shadow-blue);
+		transition: background-color 0.15s ease;
+	}
+	.wa:hover {
+		background: var(--blue-dark);
+		color: var(--white);
+	}
+	.wa-head {
+		display: flex;
+		align-items: center;
+		gap: 14px;
+	}
+	.wa-icon {
+		width: 48px;
+		height: 48px;
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.18);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.wa-title {
+		font-size: 22px;
+		font-weight: 700;
+	}
+	.wa-text {
+		color: var(--on-blue);
+	}
+	.details {
+		padding: 28px;
+		border-radius: 20px;
+		background: var(--soft);
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+	}
+	.detail {
+		display: flex;
+		gap: 14px;
+		align-items: center;
+	}
+	.detail-icon {
+		flex: 0 0 44px;
+		height: 44px;
+		border-radius: 50%;
+		background: var(--white);
+		color: var(--blue);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.detail-text {
+		display: flex;
+		flex-direction: column;
+		line-height: 1.3;
+		min-width: 0;
+	}
+	.detail-text span {
+		font-size: 14px;
+		color: var(--muted);
+	}
+	.detail-text a {
+		color: var(--ink);
+		text-decoration: none;
+		font-weight: 700;
+	}
+	.hours {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		padding-top: 18px;
+		border-top: 1px solid #d6e3f0;
+	}
+	.hours-label {
+		font-size: 14px;
+		color: var(--muted);
+	}
+	.hour {
+		display: flex;
+		justify-content: space-between;
+		gap: 16px;
+	}
+	.emergency {
+		padding: 22px 28px;
+		border-radius: 20px;
+		background: var(--navy);
+		color: var(--white);
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+	.emergency span {
+		color: var(--on-dark-2);
+	}
+
+	.location {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 20px;
+	}
+	.loc-card {
+		flex: 1 1 380px;
+		min-width: 0;
+		padding: clamp(28px, 4vw, 40px);
+		border-radius: 18px;
+		background: var(--white);
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+	}
+	.loc-title {
+		font-weight: 700;
+		font-size: clamp(30px, 3vw, 40px);
+		line-height: 1.15;
+	}
+	.address {
+		font-size: 18px;
+	}
+	.loc-list {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		color: var(--muted);
+	}
+	.directions {
+		align-self: flex-start;
+	}
+	.location :global(.loc-map) {
+		flex: 1.4 1 520px;
+		min-width: 0;
+	}
+</style>

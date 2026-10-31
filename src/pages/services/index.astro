@@ -1,0 +1,258 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import IconCard from '../../components/IconCard.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Photo from '../../components/Photo.astro';
+import { routes, site } from '../../data/site';
+import { photos } from '../../data/photos';
+
+const general = [
+	{ icon: 'toothCheck', title: 'Check-ups & exams', text: 'Every 6 months' },
+	{ icon: 'scaling', title: 'Scaling & polishing', text: 'Remove tartar & stains' },
+	{ icon: 'smile', title: "Children's dentistry", text: 'Gentle first visits', featured: true },
+	{ icon: 'filling', title: 'Tooth-coloured fillings', text: 'Blend with your teeth' },
+	{ icon: 'gums', title: 'Gum treatment', text: 'For bleeding gums' },
+	{ icon: 'extraction', title: 'Extractions', text: 'Incl. wisdom teeth' },
+] as const;
+
+const cosmetic = ['Teeth whitening', 'Veneers', 'Smile design', 'Composite bonding'];
+
+const restorative = [
+	{ name: 'Root canal treatment', bestFor: 'Deep decay, infection, toothache', visits: '[1–2]' },
+	{ name: 'Dental implants', bestFor: 'Replacing missing teeth', visits: '[3–4 over 3–6 months]' },
+	{ name: 'Crowns & bridges', bestFor: 'Broken or weak teeth', visits: '[2]' },
+	{ name: 'Braces & aligners', bestFor: 'Crooked or gapped teeth', visits: '[Monthly, 12–24 months]' },
+	{ name: 'Dentures', bestFor: 'Replacing several teeth', visits: '[3–5]' },
+];
+
+const symptoms = [
+	{ title: 'Toothache or swelling', text: 'Filling or root canal', href: `${routes.treatments}#rct` },
+	{ title: 'Bleeding gums', text: 'Cleaning or gum care', href: routes.general },
+	{ title: 'Stained teeth', text: 'Whitening or veneers', href: routes.cosmetic },
+	{ title: 'Missing tooth', text: 'Implant or bridge', href: `${routes.treatments}#implants` },
+	{ title: 'Crooked teeth', text: 'Braces or aligners', href: `${routes.treatments}#braces` },
+	{ title: 'Sensitive to cold', text: 'Desensitising care', href: routes.general },
+];
+---
+
+<BaseLayout title={`Dental Services — ${site.name}`}>
+	<PageHero
+		title="Every treatment, under one roof."
+		lead="Preventive, cosmetic and restorative dentistry for children and adults."
+		photo={photos.heroServices}
+		photoPosition="center 30%"
+		active="services"
+		crumbs={[{ label: 'Treatments' }]}
+	>
+		<nav aria-label="Categories" class="jump">
+			<a href="#general" class="glass-chip">General</a>
+			<a href="#cosmetic" class="glass-chip">Cosmetic</a>
+			<a href="#restorative" class="glass-chip">Restorative &amp; orthodontic</a>
+		</nav>
+	</PageHero>
+
+	<section id="general" aria-labelledby="general-title" class="section">
+		<div class="container stack" style="--stack-gap: 40px">
+			<div class="heading-row">
+				<div class="section-head">
+					<p class="eyebrow">01 · General dentistry</p>
+					<h2 id="general-title" class="h2">Everyday Care</h2>
+				</div>
+				<a href={routes.general} class="text-link">View general dentistry →</a>
+			</div>
+			<div class="card-grid">
+				{general.map((g) => <IconCard icon={g.icon} title={g.title} text={g.text} href={routes.general} featured={'featured' in g && g.featured} />)}
+			</div>
+		</div>
+	</section>
+
+	<section id="cosmetic" aria-labelledby="cos-title" class="section bg-soft">
+		<div class="container split">
+			<Photo label="Photo · Close-up of a bright, natural smile" photo={photos.smileCloseup} height="440px" class="cos-photo" />
+			<div class="cos-copy">
+				<p class="eyebrow">02 · Cosmetic dentistry</p>
+				<h2 id="cos-title" class="h2">A Smile You'll Love to Show</h2>
+				<p class="muted">Natural-looking changes, planned digitally so you see the result before we begin.</p>
+				<ul class="tags">{cosmetic.map((c) => <li>{c}</li>)}</ul>
+				<a href={routes.cosmetic} class="btn btn--blue cos-btn">Explore cosmetic care</a>
+			</div>
+		</div>
+	</section>
+
+	<section id="restorative" aria-labelledby="rest-title" class="section">
+		<div class="container stack" style="--stack-gap: 40px">
+			<div class="heading-row">
+				<div class="section-head">
+					<p class="eyebrow">03 · Restorative &amp; orthodontic</p>
+					<h2 id="rest-title" class="h2">Repair, Replace, Straighten</h2>
+				</div>
+				<a href={routes.treatments} class="text-link">View all treatments →</a>
+			</div>
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th scope="col">Treatment</th>
+							<th scope="col">Best for</th>
+							<th scope="col">Typical visits</th>
+						</tr>
+					</thead>
+					<tbody>
+						{
+							restorative.map((r) => (
+								<tr>
+									<th scope="row">{r.name}</th>
+									<td class="best">{r.bestFor}</td>
+									<td class="visits">{r.visits}</td>
+								</tr>
+							))
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</section>
+
+	<section aria-labelledby="unsure-title" class="section section--flush-top">
+		<div class="container">
+			<div class="panel-dark unsure">
+				<div class="section-head">
+					<p class="eyebrow eyebrow--light">Not sure what you need?</p>
+					<h2 id="unsure-title" class="h2 h2--sm">Start with how you feel</h2>
+				</div>
+				<div class="symptoms">
+					{
+						symptoms.map((s) => (
+							<a href={s.href} class="symptom">
+								<strong>{s.title}</strong>
+								<span>{s.text}</span>
+							</a>
+						))
+					}
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<CtaBand
+		title="Start with a consultation"
+		text="We'll check, explain and plan the rest together."
+		primary={{ label: 'Book appointment', href: routes.contact }}
+		secondary={{ label: 'WhatsApp us', href: site.whatsapp }}
+	/>
+</BaseLayout>
+
+<style>
+	.jump {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+		margin-top: 8px;
+	}
+
+	.card-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+		gap: 20px;
+	}
+
+	.split :global(.cos-photo) {
+		flex: 1 1 420px;
+	}
+	.cos-copy {
+		flex: 1 1 460px;
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+	}
+	.tags {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 12px;
+	}
+	.tags li {
+		padding: 14px 18px;
+		border-radius: 10px;
+		background: var(--white);
+		border: 1px solid var(--line);
+		font-weight: 600;
+	}
+	.cos-btn {
+		align-self: flex-start;
+		margin-top: 8px;
+	}
+
+	.table-wrap {
+		overflow-x: auto;
+		border: 1px solid var(--line);
+		border-radius: 16px;
+	}
+	table {
+		width: 100%;
+		min-width: 680px;
+		border-collapse: collapse;
+		text-align: left;
+	}
+	thead tr {
+		background: var(--soft);
+		font-size: 14px;
+		color: var(--muted);
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+	thead th {
+		padding: 18px 28px;
+		font-weight: 700;
+	}
+	tbody th,
+	tbody td {
+		padding: 22px 28px;
+		border-top: 1px solid var(--line-2);
+	}
+	tbody th {
+		font-size: 19px;
+		font-weight: 700;
+	}
+	td.best {
+		color: var(--muted);
+	}
+	td.visits {
+		font-weight: 600;
+		color: var(--blue);
+	}
+
+	.unsure {
+		padding: clamp(36px, 5vw, 64px);
+		display: flex;
+		flex-direction: column;
+		gap: 32px;
+	}
+	.symptoms {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+		gap: 14px;
+	}
+	.symptom {
+		padding: 20px 22px;
+		border-radius: 12px;
+		background: var(--navy-card);
+		color: var(--white);
+		text-decoration: none;
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		transition: background-color 0.15s ease;
+	}
+	.symptom:hover {
+		background: #365680;
+		color: var(--white);
+	}
+	.symptom span {
+		color: var(--on-dark-2);
+		font-size: 15px;
+	}
+</style>

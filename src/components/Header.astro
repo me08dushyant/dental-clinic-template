@@ -1,0 +1,216 @@
+---
+import Icon from './Icon.astro';
+import { routes, site } from '../data/site';
+
+export type NavKey = 'home' | 'about' | 'dentist' | 'services' | 'reviews' | 'contact';
+
+interface Props {
+	active?: NavKey;
+	bookHref?: string;
+}
+
+const { active, bookHref = routes.contact } = Astro.props;
+
+const links: { key: NavKey; label: string; href: string }[] = [
+	{ key: 'home', label: 'Home', href: routes.home },
+	{ key: 'about', label: 'About', href: routes.about },
+	{ key: 'dentist', label: 'Our Dentist', href: routes.dentist },
+	{ key: 'services', label: 'Treatments', href: routes.services },
+	{ key: 'reviews', label: 'Reviews', href: routes.reviews },
+	{ key: 'contact', label: 'Contact', href: routes.contact },
+];
+---
+
+<header class="header" data-header>
+	<div class="shell">
+		<div class="container bar">
+			<a href={routes.home} class="brand"><Icon name="tooth" size={26} strokeWidth={1.7} />{site.name}</a>
+			<button type="button" class="menu-btn" aria-expanded="false" aria-controls="site-menu" data-menu-btn>
+				<span class="sr-only">Menu</span>
+				<Icon name="menu" size={24} strokeWidth={2} class="icon-open" />
+				<Icon name="close" size={24} strokeWidth={2} class="icon-close" />
+			</button>
+			<div id="site-menu" class="menu" data-menu>
+				<nav aria-label="Main" class="nav">
+					{
+						links.map((link) => (
+							<a href={link.href} class:list={['nav-link', { active: link.key === active }]} aria-current={link.key === active ? 'page' : undefined}>
+								{link.label}
+							</a>
+						))
+					}
+				</nav>
+				<a href={bookHref} class="btn btn--sm btn--white">Book appointment</a>
+			</div>
+		</div>
+	</div>
+</header>
+
+<script>
+	// Mobile menu toggle; the menu is always visible on wide screens.
+	const button = document.querySelector<HTMLButtonElement>('[data-menu-btn]');
+	const menu = document.querySelector<HTMLElement>('[data-menu]');
+
+	if (button && menu) {
+		const setOpen = (open: boolean) => {
+			button.setAttribute('aria-expanded', String(open));
+			menu.classList.toggle('is-open', open);
+		};
+		button.addEventListener('click', () => setOpen(button.getAttribute('aria-expanded') !== 'true'));
+		menu.addEventListener('click', (event) => {
+			if ((event.target as HTMLElement).closest('a')) setOpen(false);
+		});
+		document.addEventListener('keydown', (event) => {
+			if (event.key === 'Escape' && menu.classList.contains('is-open')) {
+				setOpen(false);
+				button.focus();
+			}
+		});
+	}
+
+	// Pin a compact bar to the top once the in-hero header scrolls out of view (wide screens, via CSS).
+	// The header keeps its height so the hero doesn't jump when the bar detaches.
+	const header = document.querySelector<HTMLElement>('[data-header]');
+	if (header) {
+		const lockHeight = () => {
+			header.style.height = '';
+			header.style.height = `${header.offsetHeight}px`;
+		};
+		lockHeight();
+		addEventListener('resize', lockHeight);
+		new IntersectionObserver(([entry]) => header.classList.toggle('is-stuck', !entry.isIntersecting)).observe(header);
+	}
+</script>
+
+<style>
+	.header {
+		position: relative;
+		z-index: 5;
+	}
+	.bar {
+		padding-block: 28px;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px 40px;
+	}
+	.brand {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		color: var(--white);
+		text-decoration: none;
+		font-weight: 700;
+		font-size: 22px;
+	}
+	.brand:hover {
+		color: var(--white);
+	}
+	.nav {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px 36px;
+		font-size: 15px;
+		font-weight: 600;
+	}
+	.nav-link {
+		color: var(--on-dark);
+		text-decoration: none;
+		border-bottom: 2px solid transparent;
+	}
+	.nav-link:hover {
+		color: var(--white);
+	}
+	.nav-link.active {
+		color: var(--white);
+		border-bottom-color: var(--accent-light);
+	}
+	.menu {
+		display: contents;
+	}
+	.menu-btn {
+		display: none;
+	}
+
+	@media (min-width: 761px) {
+		.is-stuck .shell {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			background: var(--navy);
+			box-shadow: 0 10px 30px -18px rgba(31, 59, 91, 0.6);
+			animation: slide-down 0.25s ease;
+		}
+		.is-stuck .bar {
+			padding-block: 12px;
+		}
+	}
+	@keyframes slide-down {
+		from {
+			transform: translateY(-100%);
+		}
+	}
+
+	@media (max-width: 960px) {
+		.bar {
+			position: relative;
+			padding-block: 20px;
+		}
+		.menu-btn {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 48px;
+			height: 48px;
+			border-radius: 10px;
+			border: 1px solid rgba(255, 255, 255, 0.4);
+			background: rgba(255, 255, 255, 0.12);
+			color: var(--white);
+			cursor: pointer;
+		}
+		.menu-btn :global(.icon-close),
+		.menu-btn[aria-expanded='true'] :global(.icon-open) {
+			display: none;
+		}
+		.menu-btn[aria-expanded='true'] :global(.icon-close) {
+			display: block;
+		}
+		.menu {
+			display: none;
+			position: absolute;
+			top: 100%;
+			left: var(--gutter);
+			right: var(--gutter);
+			z-index: 10;
+			flex-direction: column;
+			gap: 20px;
+			padding: 20px;
+			border-radius: 16px;
+			background: var(--navy);
+			box-shadow: var(--shadow-card);
+		}
+		.menu.is-open {
+			display: flex;
+		}
+		.nav {
+			flex-direction: column;
+			gap: 0;
+			font-size: 17px;
+		}
+		.nav-link {
+			display: flex;
+			align-items: center;
+			min-height: 48px;
+			border-bottom: 1px solid var(--navy-line);
+		}
+		.nav-link.active {
+			border-bottom-color: var(--navy-line);
+			color: var(--accent-light);
+		}
+		.menu .btn {
+			min-height: 52px;
+		}
+	}
+</style>

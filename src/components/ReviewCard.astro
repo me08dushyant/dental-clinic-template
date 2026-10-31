@@ -1,0 +1,103 @@
+---
+interface Props {
+	quote: string;
+	name: string;
+	meta: string;
+	tone?: 'soft' | 'blue' | 'navy' | 'outline';
+	featured?: boolean;
+}
+
+const { quote, name, meta, tone = 'soft', featured = false } = Astro.props;
+---
+
+<figure class:list={['review', tone, { featured }]}>
+	<span aria-hidden="true" class="review-stars">★★★★★</span>
+	<blockquote>"{quote}"</blockquote>
+	<figcaption>
+		<span class="avatar"></span>
+		<span class="who">
+			<strong>{name}</strong>
+			<span class="meta">{meta}</span>
+		</span>
+	</figcaption>
+</figure>
+
+<style>
+	.review {
+		padding: 28px;
+		border-radius: 16px;
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+		--quote: var(--body-2);
+		--meta: var(--muted);
+		--avatar-bg: var(--avatar);
+		--star-color: var(--star);
+	}
+	.review.featured {
+		padding: 32px;
+		gap: 20px;
+	}
+	.soft {
+		background: var(--soft);
+	}
+	.outline {
+		border: 1px solid var(--line);
+	}
+	.blue {
+		background: var(--blue);
+		color: var(--white);
+		--quote: var(--white);
+		--meta: var(--on-dark);
+		--avatar-bg: var(--accent-light);
+		--star-color: var(--star-light);
+	}
+	.navy {
+		background: var(--navy);
+		color: var(--white);
+		--quote: var(--white);
+		--meta: var(--on-dark-2);
+		--avatar-bg: #4a6683;
+		--star-color: var(--star-light);
+	}
+	.review-stars {
+		color: var(--star-color);
+		letter-spacing: 3px;
+	}
+	blockquote {
+		color: var(--quote);
+	}
+	.featured blockquote {
+		font-size: 21px;
+		font-weight: 600;
+		line-height: 1.4;
+	}
+	.navy blockquote {
+		font-size: 19px;
+	}
+	figcaption {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+	}
+	.avatar {
+		flex: none;
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+		background: var(--avatar-bg);
+	}
+	.featured .avatar {
+		width: 44px;
+		height: 44px;
+	}
+	.who {
+		display: flex;
+		flex-direction: column;
+		line-height: 1.3;
+	}
+	.meta {
+		font-size: 14px;
+		color: var(--meta);
+	}
+</style>

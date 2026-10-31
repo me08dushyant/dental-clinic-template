@@ -1,0 +1,69 @@
+---
+// Line icons from the design. Colour follows `currentColor` unless `stroke` is set.
+const tooth =
+	'<path d="M7 3c-2.5 0-4 2-4 4.5 0 2 .8 3.5 1.3 5.5.5 2 .7 5 2 6.5 1 1 1.8-.5 2.2-2.5.3-1.5.7-3 1.5-3s1.2 1.5 1.5 3c.4 2 1.2 3.5 2.2 2.5 1.3-1.5 1.5-4.5 2-6.5.5-2 1.3-3.5 1.3-5.5C21 5 19.5 3 17 3c-2 0-3 1-5 1S9 3 7 3z"/>';
+const face = '<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5c1 1.3 2.2 2 3.5 2s2.5-.7 3.5-2"/><path d="M9 9.5h.01M15 9.5h.01"/>';
+const screen = '<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/>';
+const teethRow = '<rect x="2.5" y="6" width="5.5" height="12" rx="2.5"/><rect x="9.25" y="6" width="5.5" height="12" rx="2.5"/><rect x="16" y="6" width="5.5" height="12" rx="2.5"/><path d="M1.5 12h21"/>';
+
+const icons = {
+	tooth,
+	toothCheck: tooth + '<path d="M9 8.5l2 2 4-4"/>',
+	rootCanal: tooth + '<path d="M10 9.5v5.5M14 9.5v5.5"/>',
+	scaling: tooth + '<path d="M8 7.5h8"/>',
+	filling: tooth + '<circle cx="14" cy="8.5" r="1.8"/>',
+	extraction: tooth + '<path d="M12 1v3M10.5 2.5L12 1l1.5 1.5"/>',
+	veneer: tooth + '<path d="M6 6.5c2 1.2 10 1.2 12 0"/>',
+	bonding: tooth + '<path d="M14 3.5l-1.5 3 2 1"/>',
+	smile: face,
+	kids: face + '<path d="M10.5 16.3v1.4h3v-1.4"/>',
+	implant: '<path d="M6 3c-2 0-3 1.5-3 3.5S4.5 10 6 10h12c1.5 0 3-1.5 3-3.5S20 3 18 3c-1.6 0-2.5.8-6 .8S7.6 3 6 3z"/><path d="M10 10v8l2 3 2-3v-8"/><path d="M10 13h4M10 15.5h4"/>',
+	braces: teethRow + '<path d="M4.2 10.8h2v2.4h-2zM11 10.8h2v2.4h-2zM17.8 10.8h2v2.4h-2z"/>',
+	aligners: teethRow,
+	whitening:
+		'<path d="M6 6c-2 0-3 1.6-3 3.6 0 1.6.6 2.8 1 4.4.4 1.6.6 4 1.6 5.2.8.8 1.4-.4 1.8-2 .2-1.2.6-2.4 1.2-2.4s1 1.2 1.2 2.4c.3 1.6.9 2.8 1.8 2 1-1.2 1.2-3.6 1.6-5.2.4-1.6 1-2.8 1-4.4C16 7.6 15 6 13 6c-1.6 0-2.4.8-3.5.8S7.6 6 6 6z"/><path d="M19 2v4M17 4h4M20 9v2M19 10h2"/>',
+	gums: '<path d="M3 10c3-3 15-3 18 0"/><path d="M6 9.5v4c0 1.5 1 2.5 2 2.5s2-1 2-2.5V9M14 9v4.5c0 1.5 1 2.5 2 2.5s2-1 2-2.5v-4"/>',
+	xray: screen + '<path d="M9 8c0 2 1 4 1.5 6M15 8c0 2-1 4-1.5 6M9 8c1-1 5-1 6 0"/>',
+	smileDesign: screen + '<path d="M7 11c2.5 2 7.5 2 10 0"/>',
+	camera: '<rect x="2" y="9" width="13" height="6" rx="3"/><circle cx="5" cy="12" r="1.2"/><path d="M15 12h7"/>',
+	shield: '<path d="M12 3l7 3v5c0 4.5-3 8-7 10-4-2-7-5.5-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/>',
+	chair: '<path d="M4 14h11l3-6"/><path d="M6 14v-3a2 2 0 0 1 2-2h4"/><path d="M7 14l-1 6M14 14l1 6M5 20h12"/>',
+	access: '<circle cx="12" cy="4.5" r="1.5"/><path d="M12 7v6h5l2 5"/><path d="M9 10a5 5 0 1 0 6 7"/>',
+	heart: '<path d="M12 21s-7-4.5-7-10.5A4.5 4.5 0 0 1 12 7a4.5 4.5 0 0 1 7 3.5C19 16.5 12 21 12 21z"/>',
+	crown: '<path d="M5 9l2-5 2.5 3L12 3l2.5 4L17 4l2 5"/><path d="M5 9h14v3c0 3-1 6-2.5 8-.8 1-1.6-.5-2-2-.3-1.2-.8-2.5-2.5-2.5S10.3 16.8 10 18c-.4 1.5-1.2 3-2 2-1.5-2-3-5-3-8V9z"/>',
+	bridge: '<rect x="1.5" y="6" width="6" height="11" rx="2.5"/><rect x="9" y="6" width="6" height="11" rx="2.5"/><rect x="16.5" y="6" width="6" height="11" rx="2.5"/><path d="M4.5 4.5h15"/>',
+	phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
+	mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+	arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+	whatsapp: '<path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.6-5.2A8.5 8.5 0 1 1 21 11.5z"/>',
+	check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+	menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+	close: '<path d="M6 6l12 12M18 6L6 18"/>',
+};
+
+export type IconName = keyof typeof icons;
+
+interface Props {
+	name: IconName;
+	size?: number;
+	stroke?: string;
+	strokeWidth?: number;
+	class?: string;
+}
+
+const { name, size = 24, stroke = 'currentColor', strokeWidth = 1.3, class: className } = Astro.props;
+---
+
+<svg
+	aria-hidden="true"
+	class={className}
+	width={size}
+	height={size}
+	viewBox="0 0 24 24"
+	fill="none"
+	stroke={stroke}
+	stroke-width={strokeWidth}
+	stroke-linecap="round"
+	stroke-linejoin="round"
+	set:html={icons[name]}
+/>
