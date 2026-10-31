@@ -51,6 +51,12 @@ const structuredData = {
 		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" />
 		<title>{title}</title>
 		<script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />
+		<script is:inline>
+			// Enable scroll reveals before first paint, only when they can actually run
+			if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+				document.documentElement.classList.add('reveal-ready');
+			}
+		</script>
 	</head>
 	<body>
 		<a href="#main" class="skip-link">Skip to content</a>
@@ -59,5 +65,32 @@ const structuredData = {
 		</main>
 		<Footer />
 		<MobileActions />
+		<script>
+			// Fade elements up as they enter the viewport; siblings stagger. Selectors mirror global.css.
+			const groups = '.card-grid, .review-grid, .gallery, .steps, .options, .crowns, .faq';
+			const selector = [
+				`.section > .container > :not(${groups})`,
+				'.book-grid > *',
+				'.band .inner > *',
+				...`${groups}, .why-grid, .hygiene-steps, .rct-lists`.split(', ').map((g) => `${g} > *`),
+			].join(', ');
+
+			if (document.documentElement.classList.contains('reveal-ready')) {
+				const observer = new IntersectionObserver(
+					(entries) => {
+						for (const entry of entries) {
+							if (!entry.isIntersecting) continue;
+							const el = entry.target as HTMLElement;
+							const index = [...el.parentElement!.children].indexOf(el);
+							el.style.setProperty('--reveal-delay', `${Math.min(index, 5) * 0.09}s`);
+							el.classList.add('is-visible');
+							observer.unobserve(el);
+						}
+					},
+					{ rootMargin: '0px 0px -8% 0px' },
+				);
+				document.querySelectorAll(selector).forEach((el) => observer.observe(el));
+			}
+		</script>
 	</body>
 </html>

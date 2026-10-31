@@ -15,12 +15,52 @@ const { items, maxWidth = '900px', size = 'lg' } = Astro.props;
 			items.map((item) => (
 				<div>
 					<dt>{item.label}</dt>
-					<dd>{item.value}</dd>
+					<dd data-count>{item.value}</dd>
 				</div>
 			))
 		}
 	</dl>
 </div>
+
+<script>
+	// Count the numeric part of each stat up from zero when the strip comes into view,
+	// keeping whatever surrounds it ("[", "+", "★", "h") and its formatting (commas, decimals).
+	const stats = document.querySelectorAll<HTMLElement>('[data-count]');
+	const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+	const countUp = (el: HTMLElement) => {
+		const text = el.textContent ?? '';
+		const match = text.match(/\d[\d,]*(\.\d+)?/);
+		if (!match) return;
+		const target = Number(match[0].replace(/,/g, ''));
+		const decimals = match[1] ? match[1].length - 1 : 0;
+		const format = (n: number) =>
+			match[0].includes(',') ? n.toLocaleString('en-IN', { maximumFractionDigits: decimals }) : n.toFixed(decimals);
+		const [before, after] = [text.slice(0, match.index), text.slice(match.index! + match[0].length)];
+		const start = performance.now();
+		const duration = 1600;
+
+		const tick = (now: number) => {
+			const t = Math.min((now - start) / duration, 1);
+			const eased = 1 - Math.pow(1 - t, 3);
+			el.textContent = before + format(target * eased) + after;
+			if (t < 1) requestAnimationFrame(tick);
+			else el.textContent = text;
+		};
+		requestAnimationFrame(tick);
+	};
+
+	if (!reduced && 'IntersectionObserver' in window) {
+		const observer = new IntersectionObserver((entries) => {
+			for (const entry of entries) {
+				if (!entry.isIntersecting) continue;
+				countUp(entry.target as HTMLElement);
+				observer.unobserve(entry.target);
+			}
+		});
+		stats.forEach((el) => observer.observe(el));
+	}
+</script>
 
 <style>
 	.wrap {
@@ -58,6 +98,8 @@ const { items, maxWidth = '900px', size = 'lg' } = Astro.props;
 		font-size: 44px;
 		font-weight: 700;
 		line-height: 1.1;
+		/* Steady width while the numbers count up */
+		font-variant-numeric: tabular-nums;
 	}
 	.stats--md dd {
 		font-size: 40px;

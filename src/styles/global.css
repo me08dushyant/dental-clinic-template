@@ -404,3 +404,36 @@ a.glass-chip:hover {
 	white-space: nowrap;
 	border: 0;
 }
+
+/* Scroll reveal. Only active once BaseLayout adds .reveal-ready (JS on, motion allowed),
+   so content is never hidden without the script. Keep the selectors in sync with BaseLayout. */
+@media (prefers-reduced-motion: no-preference) {
+	.reveal-ready
+		:is(
+			.section > .container > :not(.card-grid, .review-grid, .gallery, .steps, .options, .crowns, .faq),
+			.book-grid > *,
+			.band .inner > *,
+			.card-grid > *,
+			.review-grid > *,
+			.gallery > *,
+			.why-grid > *,
+			.steps > *,
+			.hygiene-steps > *,
+			.options > *,
+			.crowns > *,
+			.rct-lists > *,
+			.faq > *
+		):not(.is-visible) {
+		opacity: 0;
+	}
+	/* Backwards fill only: once done, elements fall back to their own transforms (hover lifts keep working) */
+	.reveal-ready .is-visible {
+		animation: reveal 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) var(--reveal-delay, 0s) backwards;
+	}
+}
+@keyframes reveal {
+	from {
+		opacity: 0;
+		transform: translateY(28px);
+	}
+}

@@ -43,7 +43,9 @@ const trail: Crumb[] | undefined = crumbs && [{ label: 'Home', href: routes.home
 ---
 
 <section aria-labelledby={titleId} class:list={['hero', { 'hero--home': home }]}>
-	<img class="hero-photo" src={photo.src} alt={photo.alt} fetchpriority="high" decoding="async" style={{ objectPosition: photoPosition }} />
+	<div class="hero-media">
+		<img class="hero-photo" src={photo.src} alt={photo.alt} fetchpriority="high" decoding="async" style={{ objectPosition: photoPosition }} />
+	</div>
 	<div aria-hidden="true" class="hero-shade"></div>
 	<Header active={active} bookHref={bookHref} />
 	<div class="container hero-body" style={{ paddingBottom: padBottom }}>
@@ -79,6 +81,12 @@ const trail: Crumb[] | undefined = crumbs && [{ label: 'Home', href: routes.home
 		display: flex;
 		flex-direction: column;
 		background-image: radial-gradient(circle at 72% 40%, #e6eff8 0, var(--photo-3) 55%);
+	}
+	/* Clips the photo's entrance zoom without clipping the header's dropdown */
+	.hero-media {
+		position: absolute;
+		inset: 0;
+		overflow: hidden;
 	}
 	.hero-photo {
 		position: absolute;
@@ -135,6 +143,39 @@ const trail: Crumb[] | undefined = crumbs && [{ label: 'Home', href: routes.home
 	.hero-lead {
 		color: var(--on-dark);
 		max-width: 32em;
+	}
+
+	/* Entrance: the photo settles and the copy rises in sequence */
+	@media (prefers-reduced-motion: no-preference) {
+		.hero-photo {
+			animation: hero-settle 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+		}
+		.hero-body > :global(*) {
+			animation: hero-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+		}
+		.hero-body > :global(:nth-child(2)) {
+			animation-delay: 0.1s;
+		}
+		.hero-body > :global(:nth-child(3)) {
+			animation-delay: 0.2s;
+		}
+		.hero-body > :global(:nth-child(4)) {
+			animation-delay: 0.3s;
+		}
+		.hero-body > :global(:nth-child(n + 5)) {
+			animation-delay: 0.4s;
+		}
+	}
+	@keyframes hero-settle {
+		from {
+			transform: scale(1.06);
+		}
+	}
+	@keyframes hero-rise {
+		from {
+			opacity: 0;
+			transform: translateY(24px);
+		}
 	}
 
 	/* On narrow screens the text spans the full width, so darken the whole photo */
