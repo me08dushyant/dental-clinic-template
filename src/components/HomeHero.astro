@@ -1,0 +1,310 @@
+---
+// Split home hero on the cream canvas: copy and stats on the left, framed photo with floating cards on the right.
+import Header from './Header.astro';
+import Icon from './Icon.astro';
+import type { SitePhoto } from '../data/photos';
+
+interface Props {
+	eyebrow: string;
+	title: string;
+	lead: string;
+	photo: SitePhoto;
+	stats: { value: string; label: string }[];
+	primary: { label: string; href: string };
+	secondary: { label: string; href: string };
+	rating: { value: string; label: string };
+}
+
+const { eyebrow, title, lead, photo, stats, primary, secondary, rating } = Astro.props;
+---
+
+<section aria-labelledby="hero-title" class="hero">
+	<Header tone="light" active="home" />
+	<div class="container hero-grid">
+		<div class="copy">
+			<p class="eyebrow">{eyebrow}</p>
+			<h1 id="hero-title" class="title">{title}</h1>
+			<p class="lead">{lead}</p>
+			<dl class="stats">
+				{
+					stats.map((s) => (
+						<div>
+							<dt>{s.label}</dt>
+							<dd data-count>{s.value}</dd>
+						</div>
+					))
+				}
+			</dl>
+			<div class="btn-row">
+				<a href={primary.href} class="btn btn--lg btn--primary">{primary.label}</a>
+				<a href={secondary.href} class="btn btn--lg btn--outline"><Icon name="whatsapp" size={18} strokeWidth={1.8} />{secondary.label}</a>
+			</div>
+		</div>
+		<div class="media">
+			<div class="frame">
+				<img src={photo.src} alt={photo.alt} fetchpriority="high" decoding="async" width="1100" height="1400" />
+			</div>
+			<div class="float float--accepting">
+				<span class="float-icon"><Icon name="calendar" size={20} strokeWidth={1.6} /></span>
+				<span class="float-text"><strong>Now accepting</strong><span>New patients this week</span></span>
+			</div>
+			<div class="float float--rating">
+				<span class="float-stars" aria-hidden="true">★★★★★</span>
+				<span class="float-text"><strong>{rating.value} rating</strong><span>{rating.label}</span></span>
+			</div>
+		</div>
+	</div>
+</section>
+
+<script>
+	// Count the numeric part of each stat up from zero when it comes into view,
+	// keeping whatever surrounds it ("+", "★") and its formatting (commas, decimals).
+	const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+	const countUp = (el: HTMLElement) => {
+		const text = el.textContent ?? '';
+		const match = text.match(/\d[\d,]*(\.\d+)?/);
+		if (!match) return;
+		const target = Number(match[0].replace(/,/g, ''));
+		const decimals = match[1] ? match[1].length - 1 : 0;
+		const format = (n: number) =>
+			match[0].includes(',') ? n.toLocaleString('en-IN', { maximumFractionDigits: decimals }) : n.toFixed(decimals);
+		const [before, after] = [text.slice(0, match.index), text.slice(match.index! + match[0].length)];
+		const start = performance.now();
+
+		const tick = (now: number) => {
+			const t = Math.min((now - start) / 1600, 1);
+			el.textContent = before + format(target * (1 - Math.pow(1 - t, 3))) + after;
+			if (t < 1) requestAnimationFrame(tick);
+			else el.textContent = text;
+		};
+		requestAnimationFrame(tick);
+	};
+
+	if (!reduced && 'IntersectionObserver' in window) {
+		const observer = new IntersectionObserver((entries) => {
+			for (const entry of entries) {
+				if (!entry.isIntersecting) continue;
+				countUp(entry.target as HTMLElement);
+				observer.unobserve(entry.target);
+			}
+		});
+		document.querySelectorAll<HTMLElement>('.hero [data-count]').forEach((el) => observer.observe(el));
+	}
+</script>
+
+<style>
+	.hero {
+		position: relative;
+		background: var(--bg);
+	}
+	.hero-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+		align-items: center;
+		gap: 48px clamp(40px, 6vw, 96px);
+		padding-block: clamp(48px, 6vw, 88px) clamp(64px, 8vw, 112px);
+	}
+	.copy {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+		max-width: 600px;
+	}
+	.title {
+		font-weight: 500;
+		font-size: clamp(40px, 5.2vw, 72px);
+		line-height: 1.04;
+		letter-spacing: -0.03em;
+	}
+	.lead {
+		color: var(--body-2);
+		font-size: 17px;
+		max-width: 31em;
+	}
+	.stats {
+		display: grid;
+		grid-template-columns: repeat(3, auto);
+		justify-content: start;
+		margin: 8px 0;
+		padding-block: 22px;
+		border-block: 1px solid var(--line);
+	}
+	.stats > div {
+		display: flex;
+		flex-direction: column-reverse;
+		gap: 2px;
+		padding-inline: 0 clamp(20px, 3vw, 36px);
+	}
+	.stats > div + div {
+		padding-left: clamp(20px, 3vw, 36px);
+		border-left: 1px solid var(--line);
+	}
+	.stats dd {
+		font-family: var(--font-display);
+		font-size: clamp(24px, 2.4vw, 30px);
+		font-weight: 500;
+		letter-spacing: -0.02em;
+		font-variant-numeric: tabular-nums;
+	}
+	.stats dt {
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--muted);
+	}
+
+	.media {
+		position: relative;
+		justify-self: end;
+		width: 100%;
+		max-width: 560px;
+	}
+	.frame {
+		aspect-ratio: 4 / 5;
+		border-radius: 28px;
+		overflow: hidden;
+		background: var(--photo);
+		box-shadow: var(--shadow-soft);
+	}
+	.frame img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+	.float {
+		position: absolute;
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 14px 20px 14px 14px;
+		border-radius: 18px;
+		background: var(--white);
+		box-shadow: var(--shadow-card);
+	}
+	.float--accepting {
+		left: -40px;
+		bottom: 40px;
+	}
+	.float--rating {
+		right: -24px;
+		top: 36px;
+		padding-left: 18px;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 4px;
+	}
+	.float-icon {
+		width: 44px;
+		height: 44px;
+		border-radius: 50%;
+		background: var(--tint);
+		color: var(--accent);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.float-stars {
+		color: var(--star);
+		letter-spacing: 2px;
+		font-size: 13px;
+	}
+	.float-text {
+		display: flex;
+		flex-direction: column;
+		line-height: 1.3;
+	}
+	.float-text strong {
+		font-size: 15px;
+		font-weight: 600;
+	}
+	.float-text span {
+		font-size: 13px;
+		color: var(--muted);
+	}
+
+	/* Entrance: the photo settles and the copy rises in sequence */
+	@media (prefers-reduced-motion: no-preference) {
+		.frame img {
+			animation: settle 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+		}
+		.copy > * {
+			animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+		}
+		.copy > :nth-child(2) {
+			animation-delay: 0.08s;
+		}
+		.copy > :nth-child(3) {
+			animation-delay: 0.16s;
+		}
+		.copy > :nth-child(4) {
+			animation-delay: 0.24s;
+		}
+		.copy > :nth-child(5) {
+			animation-delay: 0.32s;
+		}
+		.float {
+			animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.5s backwards;
+		}
+		.float--rating {
+			animation-delay: 0.65s;
+		}
+	}
+	@keyframes settle {
+		from {
+			transform: scale(1.08);
+		}
+	}
+	@keyframes rise {
+		from {
+			opacity: 0;
+			transform: translateY(20px);
+		}
+	}
+
+	@media (max-width: 900px) {
+		.hero-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.media {
+			justify-self: stretch;
+			max-width: none;
+		}
+		.frame {
+			aspect-ratio: 5 / 4;
+		}
+		.frame img {
+			object-position: center 30%;
+		}
+		.float--accepting {
+			left: 16px;
+			bottom: 16px;
+		}
+		.float--rating {
+			right: 16px;
+			top: 16px;
+		}
+	}
+	@media (max-width: 480px) {
+		.stats {
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+		}
+		.stats > div {
+			padding-right: 12px;
+		}
+		.stats > div + div {
+			padding-left: 12px;
+		}
+		.frame {
+			aspect-ratio: 4 / 5;
+		}
+		.float--rating {
+			display: none;
+		}
+		.btn-row .btn {
+			flex: 1 1 auto;
+		}
+	}
+</style>

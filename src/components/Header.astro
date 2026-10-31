@@ -7,12 +7,13 @@ export type NavKey = 'home' | 'about' | 'dentist' | 'services' | 'reviews' | 'co
 interface Props {
 	active?: NavKey;
 	bookHref?: string;
+	/** `dark` sits on a photo hero (light text); `light` sits on the cream canvas (dark text). */
+	tone?: 'dark' | 'light';
 }
 
-const { active, bookHref = routes.contact } = Astro.props;
+const { active, bookHref = routes.contact, tone = 'dark' } = Astro.props;
 
 const links: { key: NavKey; label: string; href: string }[] = [
-	{ key: 'home', label: 'Home', href: routes.home },
 	{ key: 'about', label: 'About', href: routes.about },
 	{ key: 'dentist', label: 'Our Dentist', href: routes.dentist },
 	{ key: 'services', label: 'Treatments', href: routes.services },
@@ -21,10 +22,12 @@ const links: { key: NavKey; label: string; href: string }[] = [
 ];
 ---
 
-<header class="header" data-header>
+<header class:list={['header', `header--${tone}`]} data-header>
 	<div class="shell">
 		<div class="container bar">
-			<a href={routes.home} class="brand"><Icon name="tooth" size={26} strokeWidth={1.7} />{site.name}</a>
+			<a href={routes.home} class="brand" aria-label={`${site.name}, home`}>
+				<span class="brand-mark"><Icon name="tooth" size={20} strokeWidth={1.6} /></span>{site.name}
+			</a>
 			<button type="button" class="menu-btn" aria-expanded="false" aria-controls="site-menu" data-menu-btn>
 				<span class="sr-only">Menu</span>
 				<Icon name="menu" size={24} strokeWidth={2} class="icon-open" />
@@ -40,7 +43,10 @@ const links: { key: NavKey; label: string; href: string }[] = [
 						))
 					}
 				</nav>
-				<a href={bookHref} class="btn btn--sm btn--white">Book appointment</a>
+				<div class="actions">
+					<a href={site.phoneHref} class="btn btn--sm call-btn"><Icon name="phone" size={16} strokeWidth={1.8} />Call now</a>
+					<a href={bookHref} class="btn btn--sm book-btn">Book consultation</a>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -86,45 +92,100 @@ const links: { key: NavKey; label: string; href: string }[] = [
 	.header {
 		position: relative;
 		z-index: 5;
+		--h-text: var(--white);
+		--h-muted: var(--on-dark);
+		--h-line: rgba(255, 255, 255, 0.22);
+		--h-panel: var(--dark);
+	}
+	.header--light {
+		--h-text: var(--ink);
+		--h-muted: var(--body-2);
+		--h-line: var(--line);
+		--h-panel: var(--bg);
+	}
+	.header--light .shell {
+		border-bottom: 1px solid var(--line-2);
 	}
 	.bar {
-		padding-block: 28px;
+		padding-block: 22px;
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
 		justify-content: space-between;
-		gap: 16px 40px;
+		gap: 16px 32px;
 	}
 	.brand {
 		display: flex;
 		align-items: center;
 		gap: 10px;
-		color: var(--white);
+		color: var(--h-text);
 		text-decoration: none;
-		font-weight: 700;
-		font-size: 22px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 19px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
 	}
 	.brand:hover {
-		color: var(--white);
+		color: var(--h-text);
+	}
+	.brand-mark {
+		width: 36px;
+		height: 36px;
+		border-radius: 50%;
+		border: 1px solid var(--h-line);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--accent-soft);
 	}
 	.nav {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 6px 36px;
-		font-size: 15px;
-		font-weight: 600;
+		gap: 6px 32px;
+		font-size: 14px;
+		font-weight: 500;
 	}
 	.nav-link {
-		color: var(--on-dark);
+		color: var(--h-muted);
 		text-decoration: none;
-		border-bottom: 2px solid transparent;
+		border-bottom: 1px solid transparent;
+		padding-block: 4px;
 	}
 	.nav-link:hover {
-		color: var(--white);
+		color: var(--h-text);
 	}
 	.nav-link.active {
+		color: var(--h-text);
+		border-bottom-color: var(--accent-soft);
+	}
+	.actions {
+		display: flex;
+		gap: 10px;
+	}
+	.call-btn {
+		border: 1px solid var(--h-line);
+		color: var(--h-text);
+		background: transparent;
+	}
+	.call-btn:hover {
+		border-color: var(--h-text);
+		color: var(--h-text);
+	}
+	.book-btn {
+		background: var(--white);
+		color: var(--ink);
+	}
+	.book-btn:hover {
+		background: var(--tint);
+		color: var(--ink);
+	}
+	.header--light .book-btn {
+		background: var(--primary);
 		color: var(--white);
-		border-bottom-color: var(--accent-light);
+	}
+	.header--light .book-btn:hover {
+		background: var(--primary-dark);
 	}
 	.menu {
 		display: contents;
@@ -133,15 +194,20 @@ const links: { key: NavKey; label: string; href: string }[] = [
 		display: none;
 	}
 
-	@media (min-width: 761px) {
+	@media (min-width: 961px) {
 		.is-stuck .shell {
 			position: fixed;
 			top: 0;
 			left: 0;
 			right: 0;
-			background: var(--navy);
-			box-shadow: 0 10px 30px -18px rgba(31, 59, 91, 0.6);
+			background: var(--h-panel);
+			box-shadow: 0 10px 30px -18px rgba(42, 33, 27, 0.5);
 			animation: slide-down 0.25s ease;
+		}
+		.header--light.is-stuck .shell {
+			background: rgba(248, 245, 240, 0.92);
+			backdrop-filter: blur(12px);
+			-webkit-backdrop-filter: blur(12px);
 		}
 		.is-stuck .bar {
 			padding-block: 12px;
@@ -153,10 +219,17 @@ const links: { key: NavKey; label: string; href: string }[] = [
 		}
 	}
 
+	/* Mid widths: drop the call button before the nav starts wrapping */
+	@media (max-width: 1180px) and (min-width: 961px) {
+		.call-btn {
+			display: none;
+		}
+	}
+
 	@media (max-width: 960px) {
 		.bar {
 			position: relative;
-			padding-block: 20px;
+			padding-block: 16px;
 		}
 		.menu-btn {
 			display: flex;
@@ -164,10 +237,10 @@ const links: { key: NavKey; label: string; href: string }[] = [
 			justify-content: center;
 			width: 48px;
 			height: 48px;
-			border-radius: 10px;
-			border: 1px solid rgba(255, 255, 255, 0.4);
-			background: rgba(255, 255, 255, 0.12);
-			color: var(--white);
+			border-radius: 50%;
+			border: 1px solid var(--h-line);
+			background: transparent;
+			color: var(--h-text);
 			cursor: pointer;
 		}
 		.menu-btn :global(.icon-close),
@@ -187,8 +260,8 @@ const links: { key: NavKey; label: string; href: string }[] = [
 			flex-direction: column;
 			gap: 20px;
 			padding: 20px;
-			border-radius: 16px;
-			background: var(--navy);
+			border-radius: 20px;
+			background: var(--dark);
 			box-shadow: var(--shadow-card);
 		}
 		.menu.is-open {
@@ -203,14 +276,32 @@ const links: { key: NavKey; label: string; href: string }[] = [
 			display: flex;
 			align-items: center;
 			min-height: 48px;
-			border-bottom: 1px solid var(--navy-line);
+			color: var(--on-dark);
+			border-bottom: 1px solid var(--dark-line);
+		}
+		.nav-link:hover,
+		.nav-link.active {
+			color: var(--white);
+			border-bottom-color: var(--dark-line);
 		}
 		.nav-link.active {
-			border-bottom-color: var(--navy-line);
 			color: var(--accent-light);
 		}
-		.menu .btn {
+		.actions {
+			flex-direction: column;
+		}
+		.actions .btn {
 			min-height: 52px;
+		}
+		.call-btn,
+		.header--light .call-btn {
+			border-color: var(--dark-line);
+			color: var(--white);
+		}
+		.book-btn,
+		.header--light .book-btn {
+			background: var(--white);
+			color: var(--ink);
 		}
 	}
 </style>

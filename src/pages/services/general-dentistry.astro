@@ -7,12 +7,12 @@ import { bookFor, routes, site } from '../../data/site';
 import { photos } from '../../data/photos';
 
 const included = [
-	{ title: 'Check-ups & exams', time: '[30 min]', text: 'A full check of teeth, gums and bite, with digital X-rays when needed and a clear summary.' },
-	{ title: 'Scaling & polishing', time: '[45 min]', text: 'Ultrasonic cleaning removes tartar, then a polish lifts tea, coffee and tobacco stains.' },
-	{ title: "Children's dentistry", time: '[20 min]', text: 'Short, playful visits that build trust, check growth and teach good habits.', featured: true },
-	{ title: 'Tooth-coloured fillings', time: '[45 min]', text: 'Composite fillings matched to your shade, keeping as much natural tooth as possible.' },
-	{ title: 'Preventive care', time: '[20 min]', text: 'Fluoride varnish, sealants and personal brushing advice to stop decay early.' },
-	{ title: 'Gum treatment', time: '[60 min]', text: 'Deep cleaning for bleeding or receding gums, with follow-up to keep them healthy.' },
+	{ title: 'Check-ups & exams', time: '30 min', text: 'A full check of teeth, gums and bite, with digital X-rays when needed and a clear summary.' },
+	{ title: 'Scaling & polishing', time: '45 min', text: 'Ultrasonic cleaning removes tartar, then a polish lifts tea, coffee and tobacco stains.' },
+	{ title: "Children's dentistry", time: '20 min', text: 'Short, playful visits that build trust, check growth and teach good habits.', featured: true },
+	{ title: 'Tooth-coloured fillings', time: '45 min', text: 'Composite fillings matched to your shade, keeping as much natural tooth as possible.' },
+	{ title: 'Preventive care', time: '20 min', text: 'Fluoride varnish, sealants and personal brushing advice to stop decay early.' },
+	{ title: 'Gum treatment', time: '60 min', text: 'Deep cleaning for bleeding or receding gums, with follow-up to keep them healthy.' },
 ];
 
 const schedule = [
@@ -25,12 +25,16 @@ const schedule = [
 const faqs = [
 	{ q: 'Does cleaning damage enamel?', a: 'No. Scaling removes hardened deposits, not enamel. Mild sensitivity for a day is normal.' },
 	{ q: 'How long do fillings last?', a: 'With good care, many years. We check them at every visit.' },
-	{ q: 'What does a check-up cost?', a: '[Consultation fee ₹[amount]. Add your pricing note here.]' },
+	{ q: 'What does a check-up cost?', a: 'A consultation with a full check-up is ₹500. A check-up with scaling and polishing starts at ₹1,200.' },
 	{ q: 'Can my whole family come together?', a: 'Yes. Ask for back-to-back family slots when you book.' },
 ];
 ---
 
-<BaseLayout title={`General Dentistry — ${site.name}`}>
+<BaseLayout
+	title={`General Dentistry, Check-ups & Cleaning | ${site.name}, ${site.city}`}
+	description={`Check-ups, scaling and polishing, tooth-coloured fillings, gum care and children's dentistry at ${site.name}, ${site.area}. Gentle, preventive care for the whole family.`}
+	crumbs={[{ label: 'Treatments', href: routes.services }, { label: 'General' }]}
+>
 	<PageHero
 		title="General Dentistry"
 		lead="Check-ups, cleaning and fillings. The everyday care that keeps small problems small."
@@ -40,7 +44,7 @@ const faqs = [
 		wideTitle
 	>
 		<div class="btn-row hero-btns">
-			<a href={bookFor('check-up')} class="btn btn--blue">Book a check-up</a>
+			<a href={bookFor('check-up')} class="btn btn--primary">Book a check-up</a>
 			<a href={site.whatsapp} class="btn btn--outline-white">WhatsApp us</a>
 		</div>
 	</PageHero>
@@ -143,16 +147,16 @@ const faqs = [
 		color: var(--muted);
 	}
 	.included article.featured {
-		background: var(--blue);
-		border-color: var(--blue);
+		background: var(--primary);
+		border-color: var(--primary);
 		color: var(--white);
-		box-shadow: var(--shadow-blue);
+		box-shadow: var(--shadow-primary);
 	}
 	.included article.featured .pill {
 		background: var(--white);
 	}
 	.included article.featured p {
-		color: var(--on-blue);
+		color: var(--on-primary);
 	}
 
 	.sched-copy {
@@ -178,7 +182,7 @@ const faqs = [
 	.sched-when {
 		font-size: 36px;
 		font-weight: 800;
-		color: var(--blue);
+		color: var(--primary);
 		line-height: 1.1;
 	}
 	.sched-note {
@@ -186,7 +190,7 @@ const faqs = [
 		font-size: 15px;
 	}
 	.sched.dark {
-		background: var(--navy);
+		background: var(--dark);
 		color: var(--white);
 	}
 	.sched.dark .sched-when {

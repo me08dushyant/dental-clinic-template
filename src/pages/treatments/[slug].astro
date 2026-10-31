@@ -1,0 +1,444 @@
+---
+// One page per entry in data/treatments.ts.
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import TreatmentCard from '../../components/TreatmentCard.astro';
+import BeforeAfter from '../../components/BeforeAfter.astro';
+import FaqList from '../../components/FaqList.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import Icon from '../../components/Icon.astro';
+import { bookFor, routes, site, whatsappLink } from '../../data/site';
+import { dentist } from '../../data/dentist';
+import { findTreatment, treatments, type Treatment } from '../../data/treatments';
+
+export const getStaticPaths = (() => treatments.map((t) => ({ params: { slug: t.slug }, props: { treatment: t } }))) satisfies GetStaticPaths;
+
+interface Props {
+	treatment: Treatment;
+}
+
+const { treatment: t } = Astro.props;
+const related = t.related.map(findTreatment).filter((r): r is Treatment => Boolean(r));
+const ask = whatsappLink(`Hi ${site.name}, I'd like to know more about ${t.name.toLowerCase()}.\nName:\nPreferred day:`);
+const crumbs = [{ label: 'Treatments', href: routes.services }, { label: t.name }];
+
+const schema = [
+	{
+		'@type': 'MedicalProcedure',
+		name: t.name,
+		description: t.summary,
+		procedureType: t.category === 'Cosmetic' ? 'https://schema.org/NoninvasiveProcedure' : 'https://schema.org/PercutaneousProcedure',
+		howPerformed: t.steps.map((s) => `${s.title}: ${s.text}`).join(' '),
+		followup: t.aftercare.join('. '),
+		provider: { '@id': new URL('/#clinic', Astro.site).href },
+	},
+	{
+		'@type': 'FAQPage',
+		mainEntity: t.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+	},
+];
+---
+
+<BaseLayout
+	title={`${t.name} in ${site.area}, ${site.city} | ${site.name}`}
+	description={`${t.summary} ${t.facts.map((f) => `${f.label}: ${f.value}`).join(' · ')}. Book ${t.name.toLowerCase()} with ${dentist.name} at ${site.name}, ${site.area}.`}
+	image={t.photo.src}
+	imageAlt={t.photo.alt}
+	crumbs={crumbs}
+	schema={schema}
+>
+	<PageHero title={t.headline} lead={t.intro} photo={t.photo} photoPosition={t.photoPosition} padBottom="150px" active="services" bookHref={bookFor(t.bookReason)} crumbs={crumbs} />
+
+	<div class="container facts-wrap">
+		<dl class="facts">
+			{
+				t.facts.map((f) => (
+					<div>
+						<dt>{f.label}</dt>
+						<dd>{f.value}</dd>
+					</div>
+				))
+			}
+		</dl>
+	</div>
+
+	<section aria-labelledby="overview-title" class="section overview">
+		<div class="container overview-grid">
+			<div class="overview-copy">
+				<p class="eyebrow">{t.category} dentistry</p>
+				<h2 id="overview-title" class="h2">Is this treatment right for you?</h2>
+				<p class="muted">{t.intro}</p>
+				<ul class="ideal">
+					{
+						t.idealFor.map((item) => (
+							<li>
+								<span class="tick"><Icon name="check" size={13} strokeWidth={3} /></span>
+								{item}
+							</li>
+						))
+					}
+				</ul>
+			</div>
+			<aside class="book-card" aria-label="Book this treatment">
+				<span class="book-icon"><Icon name={t.icon} size={30} strokeWidth={1.3} /></span>
+				<h2 class="book-title">{t.name}</h2>
+				<p class="muted">Start with a consultation: a full check, a clear plan and a written estimate. No obligation.</p>
+				<p class="book-price">{t.facts.find((f) => f.label === 'From')?.value} <span>starting price</span></p>
+				<a href={bookFor(t.bookReason)} class="btn btn--primary">Book a consultation</a>
+				<a href={ask} class="btn btn--outline"><Icon name="whatsapp" size={18} strokeWidth={1.8} />Ask on WhatsApp</a>
+				<p class="book-note"><Icon name="clock" size={16} strokeWidth={1.6} />We reply within {site.confirmWithin}</p>
+			</aside>
+		</div>
+	</section>
+
+	<section aria-labelledby="benefits-title" class="section bg-soft">
+		<div class="container stack">
+			<div class="section-head section-head--center">
+				<p class="eyebrow">Why patients choose it</p>
+				<h2 id="benefits-title" class="h2">The benefits</h2>
+			</div>
+			<div class="card-grid">
+				{
+					t.benefits.map((b, i) => (
+						<article class="benefit">
+							<span class="benefit-num">0{i + 1}</span>
+							<h3>{b.title}</h3>
+							<p>{b.text}</p>
+						</article>
+					))
+				}
+			</div>
+		</div>
+	</section>
+
+	<section aria-labelledby="steps-title" class="section">
+		<div class="container stack">
+			<div class="heading-row">
+				<div class="section-head">
+					<p class="eyebrow">Step by step</p>
+					<h2 id="steps-title" class="h2">What to expect</h2>
+				</div>
+				<p class="muted steps-note">Every step is explained before it happens. You can pause at any point.</p>
+			</div>
+			<ol class="steps">
+				{
+					t.steps.map((s, i) => (
+						<li>
+							<span class="num-badge">{i + 1}</span>
+							<h3>{s.title}</h3>
+							<p>{s.text}</p>
+						</li>
+					))
+				}
+			</ol>
+		</div>
+	</section>
+
+	<section aria-labelledby="after-title" class="section section--flush-top">
+		<div class="container after-grid">
+			{
+				t.case && (
+					<div class="after-case">
+						<BeforeAfter label={`${t.name} result`} pair={t.case} height="240px" />
+					</div>
+				)
+			}
+			<div class="panel-dark aftercare">
+				<p class="eyebrow eyebrow--light">Aftercare</p>
+				<h2 id="after-title" class="h2 h2--sm">Looking after your result</h2>
+				<ul>
+					{
+						t.aftercare.map((a) => (
+							<li>
+								<Icon name="check" size={16} strokeWidth={2.4} />
+								{a}
+							</li>
+						))
+					}
+				</ul>
+			</div>
+		</div>
+	</section>
+
+	<section aria-labelledby="faq-title" class="section bg-soft">
+		<div class="container container--narrow stack" style="--stack-gap: 40px">
+			<div class="section-head section-head--center">
+				<p class="eyebrow">FAQ</p>
+				<h2 id="faq-title" class="h2">{t.name}: common questions</h2>
+			</div>
+			<FaqList items={t.faqs} />
+		</div>
+	</section>
+
+	<section aria-labelledby="related-title" class="section">
+		<div class="container stack">
+			<div class="heading-row">
+				<div class="section-head">
+					<p class="eyebrow">Explore more</p>
+					<h2 id="related-title" class="h2">Related treatments</h2>
+				</div>
+				<a href={routes.services} class="text-link">All treatments<Icon name="arrow" size={16} strokeWidth={2} /></a>
+			</div>
+			<div class="card-grid">
+				{related.map((r) => <TreatmentCard treatment={r} />)}
+			</div>
+		</div>
+	</section>
+
+	<CtaBand
+		title={`Ready to talk about ${t.name.toLowerCase()}?`}
+		text={`Book a consultation with ${dentist.name}. We confirm within ${site.confirmWithin}.`}
+		primary={{ label: 'Book consultation', href: bookFor(t.bookReason) }}
+		secondary={{ label: 'WhatsApp us', href: ask }}
+	/>
+</BaseLayout>
+
+<style>
+	.facts-wrap {
+		position: relative;
+		z-index: 2;
+		margin-top: -80px;
+	}
+	.facts {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
+		border-radius: 24px;
+		background: var(--white);
+		box-shadow: var(--shadow-soft);
+		overflow: hidden;
+	}
+	.facts > div {
+		padding: 26px 28px;
+		display: flex;
+		flex-direction: column-reverse;
+		gap: 4px;
+		border-left: 1px solid var(--line-2);
+	}
+	.facts > div:first-child {
+		border-left: 0;
+	}
+	.facts dt {
+		font-size: 11px;
+		font-weight: 600;
+		letter-spacing: 0.14em;
+		text-transform: uppercase;
+		color: var(--muted);
+	}
+	.facts dd {
+		font-family: var(--font-display);
+		font-size: 24px;
+		font-weight: 500;
+		letter-spacing: -0.015em;
+	}
+
+	.overview-grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.9fr);
+		gap: 48px clamp(40px, 6vw, 96px);
+		align-items: start;
+	}
+	.overview-copy {
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+	}
+	.ideal {
+		margin: 8px 0 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+		gap: 12px;
+	}
+	.ideal li {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		padding: 14px 18px;
+		border-radius: 14px;
+		background: var(--white);
+		border: 1px solid var(--line-2);
+		font-size: 15px;
+		font-weight: 500;
+	}
+	.tick {
+		flex: 0 0 24px;
+		height: 24px;
+		border-radius: 50%;
+		background: var(--primary);
+		color: var(--white);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.book-card {
+		position: sticky;
+		top: 96px;
+		padding: clamp(28px, 3vw, 36px);
+		border-radius: 24px;
+		background: var(--white);
+		border: 1px solid var(--line-2);
+		box-shadow: var(--shadow-card);
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+	}
+	.book-icon {
+		width: 56px;
+		height: 56px;
+		border-radius: 50%;
+		background: var(--tint);
+		color: var(--accent);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.book-title {
+		font-size: 26px;
+		font-weight: 500;
+		letter-spacing: -0.02em;
+	}
+	.book-price {
+		font-family: var(--font-display);
+		font-size: 30px;
+		font-weight: 500;
+		padding-block: 6px 4px;
+	}
+	.book-price span {
+		font-family: var(--font);
+		font-size: 13px;
+		color: var(--muted);
+	}
+	.book-note {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 8px;
+		font-size: 13px;
+		color: var(--muted);
+	}
+
+	.card-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+		gap: 20px;
+	}
+	.benefit {
+		padding: 32px;
+		border-radius: 22px;
+		background: var(--white);
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+	.benefit-num {
+		font-family: var(--font-display);
+		font-size: 14px;
+		color: var(--accent);
+		letter-spacing: 0.1em;
+	}
+	.benefit h3 {
+		font-size: 21px;
+		font-weight: 500;
+	}
+	.benefit p {
+		color: var(--muted);
+		font-size: 15px;
+	}
+
+	.steps-note {
+		max-width: 26em;
+	}
+	.steps {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+		gap: 20px;
+		counter-reset: step;
+	}
+	.steps li {
+		position: relative;
+		padding: 28px 24px;
+		border-top: 1px solid var(--line);
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+	}
+	.steps h3 {
+		font-size: 19px;
+		font-weight: 500;
+	}
+	.steps p {
+		color: var(--muted);
+		font-size: 15px;
+	}
+
+	.after-grid {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 20px;
+	}
+	.after-case {
+		flex: 1 1 420px;
+		min-width: 0;
+	}
+	.after-case :global(.case) {
+		height: 100%;
+		border: 1px solid var(--line-2);
+	}
+	.aftercare {
+		flex: 1 1 420px;
+		min-width: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 16px;
+	}
+	.aftercare ul {
+		margin: 8px 0 0;
+		padding: 0;
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+		color: var(--on-dark);
+	}
+	.aftercare li {
+		display: flex;
+		gap: 12px;
+		align-items: flex-start;
+	}
+	.aftercare li :global(svg) {
+		flex: none;
+		margin-top: 5px;
+		color: var(--accent-light);
+	}
+
+	@media (max-width: 900px) {
+		.overview-grid {
+			grid-template-columns: minmax(0, 1fr);
+		}
+		.book-card {
+			position: static;
+		}
+	}
+	@media (max-width: 560px) {
+		.facts {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+		.facts > div {
+			padding: 18px 20px;
+		}
+		.facts > div:nth-child(3) {
+			border-left: 0;
+		}
+		.facts > div:nth-child(n + 3) {
+			border-top: 1px solid var(--line-2);
+		}
+		.facts dd {
+			font-size: 20px;
+		}
+	}
+</style>

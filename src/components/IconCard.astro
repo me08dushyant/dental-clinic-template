@@ -1,5 +1,5 @@
 ---
-// Bordered card with a line icon and a title; `featured` fills it with blue.
+// Bordered card with a line icon and a title; `featured` fills it with espresso.
 import Icon, { type IconName } from './Icon.astro';
 
 interface Props {
@@ -37,7 +37,7 @@ const Tag = href ? 'a' : 'div';
 		min-height: 110px;
 		padding: 24px 32px;
 		border: 1px solid var(--line);
-		border-radius: 12px;
+		border-radius: 18px;
 		background: var(--white);
 		color: var(--ink);
 		text-decoration: none;
@@ -50,18 +50,18 @@ const Tag = href ? 'a' : 'div';
 	}
 	.card :global(svg) {
 		flex: none;
-		color: var(--blue);
+		color: var(--accent);
 	}
 	.card.link:hover {
-		border-color: var(--blue);
+		border-color: var(--primary);
 		color: var(--ink);
 		transform: translateY(-2px);
 	}
 	.card.featured {
-		background: var(--blue);
-		border-color: var(--blue);
+		background: var(--primary);
+		border-color: var(--primary);
 		color: var(--white);
-		box-shadow: var(--shadow-blue);
+		box-shadow: var(--shadow-primary);
 	}
 	.card.featured :global(svg) {
 		color: var(--white);
@@ -85,6 +85,6 @@ const Tag = href ? 'a' : 'div';
 		color: var(--muted);
 	}
 	.featured .text {
-		color: var(--on-blue);
+		color: var(--on-primary);
 	}
 </style>

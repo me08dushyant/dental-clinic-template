@@ -16,7 +16,7 @@ const jumpLinks = [
 
 const stages = [
 	{ stage: 'STAGE 1 · DAY 1', title: 'Planning & placement', text: 'X-ray assessment, then the implant is placed under local anaesthesia.' },
-	{ stage: 'STAGE 2 · [3–6 MONTHS]', title: 'Healing', text: 'The bone bonds with the implant. A temporary tooth can be fitted.', featured: true },
+	{ stage: 'STAGE 2 · 3–6 MONTHS', title: 'Healing', text: 'The bone bonds with the implant. A temporary tooth can be fitted.', featured: true },
 	{ stage: 'STAGE 3 · FINAL VISIT', title: 'Your new crown', text: 'A custom crown is fixed in place, matched to your other teeth.' },
 ];
 
@@ -24,11 +24,15 @@ const braces = [
 	{ label: 'Visibility', metal: 'Visible', ceramic: 'Subtle', aligners: 'Nearly invisible' },
 	{ label: 'Removable', metal: 'No', ceramic: 'No', aligners: 'Yes' },
 	{ label: 'Best for', metal: 'Complex cases, teens', ceramic: 'Adults wanting discretion', aligners: 'Mild to moderate crowding' },
-	{ label: 'Duration', metal: '[18–24 months]', ceramic: '[18–24 months]', aligners: '[9–18 months]' },
+	{ label: 'Duration', metal: '18–24 months', ceramic: '18–24 months', aligners: '9–18 months' },
 ];
 ---
 
-<BaseLayout title={`Dental Treatments — ${site.name}`}>
+<BaseLayout
+	title={`Root Canal, Implants, Crowns & Braces | ${site.name}, ${site.city}`}
+	description={`Painless root canals, dental implants, zirconia crowns and braces or clear aligners at ${site.name}, ${site.area}. Clear timelines and written estimates.`}
+	crumbs={[{ label: 'Treatments', href: routes.services }, { label: 'Restorative' }]}
+>
 	<PageHero
 		title="Restore, replace and straighten."
 		lead="Root canals, implants, crowns and braces, explained clearly and done gently."
@@ -62,7 +66,7 @@ const braces = [
 						<strong>What to expect</strong>
 						<ul>
 							<li>Local anaesthesia</li>
-							<li>[1–2] visits of [45–60 min]</li>
+							<li>1–2 visits of 45–60 min</li>
 							<li>A crown to protect it</li>
 						</ul>
 					</div>
@@ -104,7 +108,7 @@ const braces = [
 					<div class="crown-body">
 						<h3>Crown</h3>
 						<p class="muted">A cap that restores the shape and strength of a damaged or root-canal-treated tooth.</p>
-						<p class="spec"><strong>Materials:</strong> zirconia, E-max, PFM · <strong>Visits:</strong> [2]</p>
+						<p class="spec"><strong>Materials:</strong> zirconia, E-max, PFM · <strong>Visits:</strong> 2</p>
 					</div>
 				</article>
 				<article class="crown">
@@ -112,7 +116,7 @@ const braces = [
 					<div class="crown-body">
 						<h3>Bridge</h3>
 						<p class="muted">A fixed row of connected crowns that fills a gap, anchored to the teeth on either side.</p>
-						<p class="spec"><strong>Best when:</strong> neighbours need crowns · <strong>Visits:</strong> [2–3]</p>
+						<p class="spec"><strong>Best when:</strong> neighbours need crowns · <strong>Visits:</strong> 2–3</p>
 					</div>
 				</article>
 			</div>
@@ -234,7 +238,7 @@ const braces = [
 	.stage {
 		font-size: 14px;
 		font-weight: 700;
-		color: var(--blue);
+		color: var(--primary);
 	}
 	.stages h3 {
 		font-size: 22px;
@@ -245,14 +249,14 @@ const braces = [
 		font-size: 16px;
 	}
 	.stages li.featured {
-		background: var(--blue);
-		border-color: var(--blue);
+		background: var(--primary);
+		border-color: var(--primary);
 		color: var(--white);
-		box-shadow: var(--shadow-blue);
+		box-shadow: var(--shadow-primary);
 	}
 	.stages li.featured .stage,
 	.stages li.featured p {
-		color: var(--on-blue);
+		color: var(--on-primary);
 	}
 
 	.crowns {
@@ -270,7 +274,7 @@ const braces = [
 	}
 	.crown :global(svg) {
 		flex: 0 0 44px;
-		color: var(--blue);
+		color: var(--primary);
 	}
 	.crown-body {
 		display: flex;
@@ -308,7 +312,7 @@ const braces = [
 	th,
 	td {
 		padding: 16px 20px;
-		border-bottom: 1px solid var(--navy-line);
+		border-bottom: 1px solid var(--dark-line);
 	}
 	tbody tr:last-child th,
 	tbody tr:last-child td {
@@ -325,8 +329,8 @@ const braces = [
 		font-weight: 600;
 	}
 	.hl {
-		background: var(--blue);
-		border-bottom-color: #5b8cc6;
+		background: var(--accent);
+		border-bottom-color: rgba(255, 255, 255, 0.18);
 	}
 	.hl--top {
 		border-radius: 12px 12px 0 0;

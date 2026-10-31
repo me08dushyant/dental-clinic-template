@@ -1,5 +1,5 @@
 ---
-// Full-width blue call-to-action band that closes each page.
+// Full-width espresso call-to-action band that closes each page.
 interface Action {
 	label: string;
 	href: string;
@@ -30,7 +30,7 @@ const { title, text, primary, secondary } = Astro.props;
 
 <style>
 	.band {
-		background: var(--blue);
+		background: var(--primary);
 		color: var(--white);
 	}
 	.inner {
@@ -54,7 +54,7 @@ const { title, text, primary, secondary } = Astro.props;
 		line-height: 1.1;
 	}
 	.text {
-		color: var(--on-blue);
+		color: var(--on-primary);
 		font-size: 18px;
 	}
 </style>

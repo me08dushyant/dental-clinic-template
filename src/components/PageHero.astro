@@ -73,14 +73,14 @@ const trail: Crumb[] | undefined = crumbs && [{ label: 'Home', href: routes.home
 	.hero {
 		position: relative;
 		background-color: var(--photo-3);
-		background-image: radial-gradient(circle at 75% 40%, #e6eff8 0, var(--photo-3) 55%);
+		background-image: radial-gradient(circle at 75% 40%, #f1e7da 0, var(--photo-3) 55%);
 		color: var(--white);
 	}
 	.hero--home {
 		min-height: 760px;
 		display: flex;
 		flex-direction: column;
-		background-image: radial-gradient(circle at 72% 40%, #e6eff8 0, var(--photo-3) 55%);
+		background-image: radial-gradient(circle at 72% 40%, #f1e7da 0, var(--photo-3) 55%);
 	}
 	/* Clips the photo's entrance zoom without clipping the header's dropdown */
 	.hero-media {
@@ -98,10 +98,10 @@ const trail: Crumb[] | undefined = crumbs && [{ label: 'Home', href: routes.home
 	.hero-shade {
 		position: absolute;
 		inset: 0;
-		background: linear-gradient(90deg, rgba(36, 59, 88, 0.97) 0%, rgba(44, 72, 106, 0.9) 38%, rgba(60, 96, 138, 0.35) 68%, rgba(201, 218, 236, 0) 90%);
+		background: linear-gradient(90deg, rgba(30, 23, 18, 0.94) 0%, rgba(36, 28, 23, 0.84) 38%, rgba(48, 37, 29, 0.3) 70%, rgba(48, 37, 29, 0) 92%);
 	}
 	.hero--home .hero-shade {
-		background: linear-gradient(90deg, rgba(36, 59, 88, 0.97) 0%, rgba(44, 72, 106, 0.88) 32%, rgba(60, 96, 138, 0.35) 62%, rgba(201, 218, 236, 0) 85%);
+		background: linear-gradient(90deg, rgba(30, 23, 18, 0.94) 0%, rgba(36, 28, 23, 0.84) 32%, rgba(48, 37, 29, 0.3) 62%, rgba(48, 37, 29, 0) 85%);
 	}
 	.hero-body {
 		position: relative;
@@ -128,10 +128,10 @@ const trail: Crumb[] | undefined = crumbs && [{ label: 'Home', href: routes.home
 		color: var(--white);
 	}
 	.hero-title {
-		font-weight: 700;
-		font-size: clamp(42px, 5vw, 68px);
+		font-weight: 500;
+		font-size: clamp(40px, 5vw, 66px);
 		line-height: 1.05;
-		letter-spacing: -0.02em;
+		letter-spacing: -0.03em;
 		max-width: 11em;
 	}
 	.hero-title--wide {
@@ -182,7 +182,7 @@ const trail: Crumb[] | undefined = crumbs && [{ label: 'Home', href: routes.home
 	@media (max-width: 760px) {
 		.hero-shade,
 		.hero--home .hero-shade {
-			background: linear-gradient(180deg, rgba(36, 59, 88, 0.95) 0%, rgba(44, 72, 106, 0.9) 70%, rgba(60, 96, 138, 0.75) 100%);
+			background: linear-gradient(180deg, rgba(30, 23, 18, 0.92) 0%, rgba(36, 28, 23, 0.86) 70%, rgba(48, 37, 29, 0.7) 100%);
 		}
 		.hero--home {
 			min-height: 0;

@@ -28,11 +28,12 @@ const { items } = Astro.props;
 	}
 	details {
 		border: 1px solid var(--line);
-		border-radius: 12px;
+		border-radius: 16px;
 		padding: 20px 24px;
+		background: var(--white);
 	}
 	details[open] {
-		border-color: var(--blue);
+		border-color: var(--accent-soft);
 	}
 	summary {
 		display: flex;
@@ -47,7 +48,7 @@ const { items } = Astro.props;
 		display: none;
 	}
 	.sign {
-		color: var(--blue);
+		color: var(--accent);
 	}
 	.sign::before {
 		content: '+';

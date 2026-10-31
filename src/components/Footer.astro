@@ -1,6 +1,7 @@
 ---
 import Icon from './Icon.astro';
-import { routes, site } from '../data/site';
+import { routes, site, treatmentHref } from '../data/site';
+import { dentist } from '../data/dentist';
 ---
 
 <footer class="footer">
@@ -8,26 +9,32 @@ import { routes, site } from '../data/site';
 		<div class="cols">
 			<div class="col col--brand">
 				<span class="brand"><Icon name="tooth" size={24} strokeWidth={1.7} />{site.name}</span>
-				<span>Gentle family dentistry in {site.city}.</span>
+				<span>{site.tagline} in {site.area}, {site.city}. Led by {dentist.name}.</span>
+				<span class="rating"><span aria-hidden="true" class="stars">★★★★★</span>{site.rating.value} from {site.rating.count} Google reviews</span>
 			</div>
 			<nav aria-label="Clinic" class="col">
 				<span class="heading">Clinic</span>
 				<a href={routes.about}>About</a>
+				<a href={routes.services}>All treatments</a>
 				<a href={routes.dentist}>Our dentist</a>
 				<a href={routes.reviews}>Reviews</a>
 				<a href={routes.contact}>Contact</a>
 			</nav>
 			<nav aria-label="Treatments" class="col">
 				<span class="heading">Treatments</span>
-				<a href={routes.general}>General dentistry</a>
-				<a href={routes.cosmetic}>Cosmetic dentistry</a>
-				<a href={`${routes.treatments}#implants`}>Implants &amp; RCT</a>
-				<a href={`${routes.treatments}#braces`}>Braces &amp; aligners</a>
+				<a href={treatmentHref('check-up-and-cleaning')}>Check-up &amp; cleaning</a>
+				<a href={treatmentHref('root-canal-treatment')}>Root canal treatment</a>
+				<a href={treatmentHref('dental-implants')}>Dental implants</a>
+				<a href={treatmentHref('clear-aligners')}>Braces &amp; aligners</a>
+				<a href={treatmentHref('teeth-whitening')}>Teeth whitening</a>
+				<a href={treatmentHref('veneers')}>Veneers &amp; smile design</a>
 			</nav>
 			<div class="col">
 				<span class="heading">Contact</span>
-				<span>{site.addressShort}</span>
+				<span>{site.street},<br />{site.area}, {site.city} {site.postalCode}</span>
 				<a href={site.phoneHref} class="phone">{site.phoneDisplay}</a>
+				<a href={site.whatsapp}>WhatsApp us</a>
+				<a href={site.emailHref}>{site.email}</a>
 				<span>{site.hoursShort}</span>
 			</div>
 		</div>
@@ -45,7 +52,7 @@ import { routes, site } from '../data/site';
 		font-size: 15px;
 	}
 	.inner {
-		padding-block: 64px 32px;
+		padding-block: 72px 32px;
 		display: flex;
 		flex-direction: column;
 		gap: 48px;
@@ -68,12 +75,30 @@ import { routes, site } from '../data/site';
 		align-items: center;
 		gap: 10px;
 		color: var(--white);
-		font-weight: 700;
-		font-size: 20px;
+		font-family: var(--font-display);
+		font-weight: 600;
+		font-size: 18px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+	.brand :global(svg) {
+		color: var(--accent-light);
+	}
+	.rating {
+		display: flex;
+		flex-direction: column;
+		font-size: 14px;
+	}
+	.stars {
+		color: var(--star-light);
 	}
 	.heading {
-		color: var(--white);
-		font-weight: 700;
+		margin-bottom: 6px;
+		color: var(--accent-light);
+		font-size: 12px;
+		font-weight: 600;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
 	}
 	.col a {
 		color: var(--footer-text);

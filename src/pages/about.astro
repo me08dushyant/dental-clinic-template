@@ -8,10 +8,10 @@ import { routes, site } from '../data/site';
 import { photos } from '../data/photos';
 
 const facts = [
-	{ value: '[2011]', label: 'caring since' },
-	{ value: '[2]', label: 'treatment rooms' },
-	{ value: '[6]', label: 'care team members' },
-	{ value: '[10K+]', label: 'happy patients' },
+	{ value: String(site.founded), label: 'caring since' },
+	{ value: '2', label: 'treatment rooms' },
+	{ value: '6', label: 'care team members' },
+	{ value: '10,000+', label: 'happy patients' },
 ];
 
 const steps = [
@@ -27,7 +27,7 @@ const facilities = [
 	{ icon: 'shield', title: 'Class B autoclave', text: 'Hospital-grade sterilisation' },
 	{ icon: 'chair', title: 'Ergonomic chairs', text: 'Comfort through longer visits' },
 	{ icon: 'smile', title: "Kids' corner", text: 'Books, toys, a calm waiting space' },
-	{ icon: 'access', title: 'Accessible clinic', text: '[Lift / ground floor, parking]' },
+	{ icon: 'access', title: 'Accessible clinic', text: 'Step-free entrance, lift & parking' },
 ] as const;
 
 const hygiene = ['Ultrasonic cleaning', 'Sealed in sterile pouches', 'Autoclaved at 134°C', 'Opened in front of you'];
@@ -41,10 +41,14 @@ const gallery = [
 ];
 ---
 
-<BaseLayout title={`About the Clinic — ${site.name}`}>
+<BaseLayout
+	title={`About ${site.name} | Family Dental Clinic in ${site.area}, ${site.city}`}
+	description={`Since ${site.founded}, ${site.name} has offered gentle, honest family dentistry in ${site.area}, ${site.city}: digital X-rays, Class B sterilisation, a kids' corner and an experienced, unhurried team.`}
+	crumbs={[{ label: 'About' }]}
+>
 	<PageHero
 		title="A family clinic built on trust."
-		lead="Since [Year], we've cared for children, parents and grandparents in [Area, City] with the same patience and honesty."
+		lead={`Since ${site.founded}, we've cared for children, parents and grandparents in ${site.area} with the same patience and honesty.`}
 		photo={photos.heroAbout}
 		padBottom="140px"
 		active="about"
@@ -71,7 +75,7 @@ const gallery = [
 			<div class="story-copy">
 				<p class="eyebrow">Our story</p>
 				<h2 id="story-title" class="h2">Dental visits shouldn't feel stressful</h2>
-				<p class="muted">[Tell the clinic's origin in 2–3 sentences: who founded it, when, and what they wanted to do differently for patients.]</p>
+				<p class="muted">Dr. Meera Iyer opened {site.name} in {site.founded} after years in a busy hospital implant unit. She wanted a clinic where nobody felt rushed, every option was explained honestly, and hospital-grade precision came with a warm welcome.</p>
 				<p class="muted">Today many of our patients started as children and now bring their own kids. Keeping that trust is the thing we work hardest at.</p>
 			</div>
 		</div>
@@ -181,7 +185,7 @@ const gallery = [
 	.facts dd {
 		font-size: 40px;
 		font-weight: 700;
-		color: var(--blue);
+		color: var(--primary);
 		line-height: 1.1;
 	}
 
@@ -221,16 +225,16 @@ const gallery = [
 		font-size: 16px;
 	}
 	.steps li.featured {
-		background: var(--blue);
-		border-color: var(--blue);
+		background: var(--primary);
+		border-color: var(--primary);
 		color: var(--white);
-		box-shadow: var(--shadow-blue);
+		box-shadow: var(--shadow-primary);
 	}
 	.steps li.featured .num-badge {
 		background: var(--white);
 	}
 	.steps li.featured p {
-		color: var(--on-blue);
+		color: var(--on-primary);
 	}
 
 	.card-grid {
@@ -274,13 +278,13 @@ const gallery = [
 		align-items: center;
 		padding: 18px;
 		border-radius: 12px;
-		background: var(--navy-card);
+		background: var(--dark-card);
 	}
 	.hygiene-n {
 		flex: 0 0 32px;
 		height: 32px;
 		border-radius: 50%;
-		background: var(--blue);
+		background: var(--primary);
 		font-weight: 800;
 		display: flex;
 		align-items: center;

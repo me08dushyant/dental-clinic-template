@@ -4,7 +4,9 @@ import PageHero from '../../components/PageHero.astro';
 import IconCard from '../../components/IconCard.astro';
 import CtaBand from '../../components/CtaBand.astro';
 import Photo from '../../components/Photo.astro';
-import { routes, site } from '../../data/site';
+import TreatmentCard from '../../components/TreatmentCard.astro';
+import { routes, site, treatmentHref } from '../../data/site';
+import { treatments } from '../../data/treatments';
 import { photos } from '../../data/photos';
 
 const general = [
@@ -19,24 +21,28 @@ const general = [
 const cosmetic = ['Teeth whitening', 'Veneers', 'Smile design', 'Composite bonding'];
 
 const restorative = [
-	{ name: 'Root canal treatment', bestFor: 'Deep decay, infection, toothache', visits: '[1–2]' },
-	{ name: 'Dental implants', bestFor: 'Replacing missing teeth', visits: '[3–4 over 3–6 months]' },
-	{ name: 'Crowns & bridges', bestFor: 'Broken or weak teeth', visits: '[2]' },
-	{ name: 'Braces & aligners', bestFor: 'Crooked or gapped teeth', visits: '[Monthly, 12–24 months]' },
-	{ name: 'Dentures', bestFor: 'Replacing several teeth', visits: '[3–5]' },
+	{ name: 'Root canal treatment', bestFor: 'Deep decay, infection, toothache', visits: '1–2', href: treatmentHref('root-canal-treatment') },
+	{ name: 'Dental implants', bestFor: 'Replacing missing teeth', visits: '3–4 over 3–6 months', href: treatmentHref('dental-implants') },
+	{ name: 'Crowns & bridges', bestFor: 'Broken or weak teeth', visits: '2', href: treatmentHref('crowns-and-bridges') },
+	{ name: 'Braces & aligners', bestFor: 'Crooked or gapped teeth', visits: 'Monthly, 12–24 months', href: treatmentHref('clear-aligners') },
+	{ name: 'Dentures', bestFor: 'Replacing several teeth', visits: '3–5' },
 ];
 
 const symptoms = [
-	{ title: 'Toothache or swelling', text: 'Filling or root canal', href: `${routes.treatments}#rct` },
-	{ title: 'Bleeding gums', text: 'Cleaning or gum care', href: routes.general },
-	{ title: 'Stained teeth', text: 'Whitening or veneers', href: routes.cosmetic },
-	{ title: 'Missing tooth', text: 'Implant or bridge', href: `${routes.treatments}#implants` },
-	{ title: 'Crooked teeth', text: 'Braces or aligners', href: `${routes.treatments}#braces` },
+	{ title: 'Toothache or swelling', text: 'Filling or root canal', href: treatmentHref('root-canal-treatment') },
+	{ title: 'Bleeding gums', text: 'Cleaning or gum care', href: treatmentHref('check-up-and-cleaning') },
+	{ title: 'Stained teeth', text: 'Whitening or veneers', href: treatmentHref('teeth-whitening') },
+	{ title: 'Missing tooth', text: 'Implant or bridge', href: treatmentHref('dental-implants') },
+	{ title: 'Crooked teeth', text: 'Braces or aligners', href: treatmentHref('clear-aligners') },
 	{ title: 'Sensitive to cold', text: 'Desensitising care', href: routes.general },
 ];
 ---
 
-<BaseLayout title={`Dental Services — ${site.name}`}>
+<BaseLayout
+	title={`Dental Treatments & Prices | ${site.name}, ${site.area}, ${site.city}`}
+	description={`Every dental treatment under one roof at ${site.name}: check-ups, kids' dentistry, root canals, implants, aligners, whitening and veneers, with starting prices and clear timelines.`}
+	crumbs={[{ label: 'Treatments' }]}
+>
 	<PageHero
 		title="Every treatment, under one roof."
 		lead="Preventive, cosmetic and restorative dentistry for children and adults."
@@ -52,7 +58,20 @@ const symptoms = [
 		</nav>
 	</PageHero>
 
-	<section id="general" aria-labelledby="general-title" class="section">
+	<section aria-labelledby="guides-title" class="section">
+		<div class="container stack" style="--stack-gap: 40px">
+			<div class="section-head section-head--center">
+				<p class="eyebrow">Treatment guides</p>
+				<h2 id="guides-title" class="h2">Find the right treatment</h2>
+				<p class="muted">What each treatment involves, how long it takes and what it costs, explained in plain language.</p>
+			</div>
+			<div class="card-grid">
+				{treatments.map((t) => <TreatmentCard treatment={t} />)}
+			</div>
+		</div>
+	</section>
+
+	<section id="general" aria-labelledby="general-title" class="section bg-soft">
 		<div class="container stack" style="--stack-gap: 40px">
 			<div class="heading-row">
 				<div class="section-head">
@@ -67,7 +86,7 @@ const symptoms = [
 		</div>
 	</section>
 
-	<section id="cosmetic" aria-labelledby="cos-title" class="section bg-soft">
+	<section id="cosmetic" aria-labelledby="cos-title" class="section">
 		<div class="container split">
 			<Photo label="Photo · Close-up of a bright, natural smile" photo={photos.smileCloseup} height="440px" class="cos-photo" />
 			<div class="cos-copy">
@@ -75,7 +94,7 @@ const symptoms = [
 				<h2 id="cos-title" class="h2">A Smile You'll Love to Show</h2>
 				<p class="muted">Natural-looking changes, planned digitally so you see the result before we begin.</p>
 				<ul class="tags">{cosmetic.map((c) => <li>{c}</li>)}</ul>
-				<a href={routes.cosmetic} class="btn btn--blue cos-btn">Explore cosmetic care</a>
+				<a href={routes.cosmetic} class="btn btn--primary cos-btn">Explore cosmetic care</a>
 			</div>
 		</div>
 	</section>
@@ -102,7 +121,7 @@ const symptoms = [
 						{
 							restorative.map((r) => (
 								<tr>
-									<th scope="row">{r.name}</th>
+									<th scope="row">{'href' in r ? <a href={r.href}>{r.name}</a> : r.name}</th>
 									<td class="best">{r.bestFor}</td>
 									<td class="visits">{r.visits}</td>
 								</tr>
@@ -190,6 +209,7 @@ const symptoms = [
 		overflow-x: auto;
 		border: 1px solid var(--line);
 		border-radius: 16px;
+		background: var(--white);
 	}
 	table {
 		width: 100%;
@@ -215,14 +235,22 @@ const symptoms = [
 	}
 	tbody th {
 		font-size: 19px;
-		font-weight: 700;
+		font-weight: 500;
+	}
+	tbody th a {
+		color: var(--ink);
+		text-decoration-color: var(--accent-soft);
+		text-underline-offset: 4px;
+	}
+	tbody th a:hover {
+		color: var(--accent);
 	}
 	td.best {
 		color: var(--muted);
 	}
 	td.visits {
 		font-weight: 600;
-		color: var(--blue);
+		color: var(--accent);
 	}
 
 	.unsure {
@@ -239,7 +267,7 @@ const symptoms = [
 	.symptom {
 		padding: 20px 22px;
 		border-radius: 12px;
-		background: var(--navy-card);
+		background: var(--dark-card);
 		color: var(--white);
 		text-decoration: none;
 		display: flex;
@@ -248,7 +276,7 @@ const symptoms = [
 		transition: background-color 0.15s ease;
 	}
 	.symptom:hover {
-		background: #365680;
+		background: #43352b;
 		color: var(--white);
 	}
 	.symptom span {

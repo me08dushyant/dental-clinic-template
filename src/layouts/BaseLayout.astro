@@ -1,55 +1,129 @@
 ---
 import Footer from '../components/Footer.astro';
 import MobileActions from '../components/MobileActions.astro';
-import { site } from '../data/site';
+import { routes, site } from '../data/site';
+import { dentist } from '../data/dentist';
 import '../styles/global.css';
+
+interface Crumb {
+	label: string;
+	href?: string;
+}
 
 interface Props {
 	title: string;
 	description?: string;
+	/** Social card image, relative to the site root. */
+	image?: string;
+	imageAlt?: string;
+	type?: 'website' | 'article';
+	/** Breadcrumb trail for search results (Home is added automatically). */
+	crumbs?: Crumb[];
+	/** Extra schema.org objects for this page, e.g. an FAQPage. */
+	schema?: Record<string, unknown>[];
 }
 
-const { title, description = `Gentle family dentistry in ${site.city}.` } = Astro.props;
+const {
+	title,
+	description = `${site.tagline} in ${site.area}, ${site.city}. Check-ups, implants, root canals, aligners and smile makeovers by ${dentist.name}.`,
+	image = '/og-image.jpg',
+	imageAlt = `${site.name}, ${site.tagline.toLowerCase()} in ${site.city}`,
+	type = 'website',
+	crumbs,
+	schema = [],
+} = Astro.props;
 
-// schema.org Dentist data so search results can show hours, phone and rating
-const structuredData = {
-	'@context': 'https://schema.org',
+const base = Astro.site ?? new URL(site.url);
+// No trailing slash, matching the sitemap
+const path = Astro.url.pathname.replace(/(.)\/$/, '$1');
+const canonical = new URL(path, base).href;
+const imageUrl = new URL(image, base).href;
+const clinicId = new URL('/#clinic', base).href;
+
+// schema.org Dentist data so search results can show hours, phone, address and rating
+const clinic = {
 	'@type': 'Dentist',
+	'@id': clinicId,
 	name: site.name,
-	description,
-	url: site.url,
-	telephone: site.phoneHref.replace('tel:', ''),
+	legalName: site.legalName,
+	description: `${site.tagline} in ${site.area}, ${site.city}.`,
+	url: base.href,
+	image: imageUrl,
+	telephone: `+${site.phone}`,
+	email: site.email,
+	priceRange: '₹₹',
+	currenciesAccepted: 'INR',
+	paymentAccepted: 'Cash, UPI, Credit card, EMI',
 	address: {
 		'@type': 'PostalAddress',
-		streetAddress: site.street || undefined,
-		addressLocality: site.city,
-		postalCode: site.postalCode || undefined,
+		streetAddress: site.street,
+		addressLocality: `${site.area}, ${site.city}`,
+		addressRegion: site.region,
+		postalCode: site.postalCode,
 		addressCountry: 'IN',
 	},
+	hasMap: site.maps,
+	sameAs: [site.instagram],
 	openingHoursSpecification: site.schedule.map((s) => ({
 		'@type': 'OpeningHoursSpecification',
 		dayOfWeek: s.days,
 		opens: s.opens,
 		closes: s.closes,
 	})),
+	founder: { '@type': 'Person', name: dentist.name, jobTitle: dentist.role },
 	aggregateRating: site.rating.value
-		? { '@type': 'AggregateRating', ratingValue: site.rating.value, reviewCount: site.rating.count }
+		? { '@type': 'AggregateRating', ratingValue: site.rating.value, reviewCount: site.rating.count, bestRating: '5' }
 		: undefined,
+};
+
+const breadcrumbs = crumbs && {
+	'@type': 'BreadcrumbList',
+	itemListElement: [{ label: 'Home', href: routes.home }, ...crumbs].map((c, i) => ({
+		'@type': 'ListItem',
+		position: i + 1,
+		name: c.label,
+		item: new URL(c.href ?? path, base).href,
+	})),
+};
+
+const structuredData = {
+	'@context': 'https://schema.org',
+	'@graph': [clinic, ...(breadcrumbs ? [breadcrumbs] : []), ...schema],
 };
 ---
 
-<html lang="en">
+<html lang="en-IN">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
 		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		<meta name="theme-color" content="#f8f5f0" />
+		<meta name="format-detection" content="telephone=no" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
+		<link rel="sitemap" href="/sitemap.xml" />
 		<meta name="generator" content={Astro.generator} />
+
+		<meta property="og:type" content={type} />
+		<meta property="og:site_name" content={site.name} />
+		<meta property="og:locale" content="en_IN" />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:url" content={canonical} />
+		<meta property="og:image" content={imageUrl} />
+		<meta property="og:image:alt" content={imageAlt} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={imageUrl} />
+
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" />
-		<title>{title}</title>
+		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Inter+Tight:wght@400;500;600&display=swap" />
 		<script is:inline type="application/ld+json" set:html={JSON.stringify(structuredData)} />
 		<script is:inline>
 			// Enable scroll reveals before first paint, only when they can actually run

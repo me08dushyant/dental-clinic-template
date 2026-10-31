@@ -1,511 +1,499 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import PageHero from '../components/PageHero.astro';
-import GlassStats from '../components/GlassStats.astro';
-import IconCard from '../components/IconCard.astro';
+import HomeHero from '../components/HomeHero.astro';
+import TreatmentCard from '../components/TreatmentCard.astro';
 import ReviewCard from '../components/ReviewCard.astro';
+import RatingSummary from '../components/RatingSummary.astro';
+import BeforeAfter from '../components/BeforeAfter.astro';
 import FaqList from '../components/FaqList.astro';
 import MapPlaceholder from '../components/MapPlaceholder.astro';
 import CtaBand from '../components/CtaBand.astro';
 import Photo from '../components/Photo.astro';
 import Icon from '../components/Icon.astro';
 import OpenStatus from '../components/OpenStatus.astro';
-import { routes, site } from '../data/site';
-import { photos } from '../data/photos';
+import { routes, site, treatmentHref } from '../data/site';
+import { photos, smileCases } from '../data/photos';
+import { dentist } from '../data/dentist';
+import { reviews } from '../data/reviews';
+import { findTreatment, type Treatment } from '../data/treatments';
 
 const stats = [
-	{ value: '[15+]', label: 'years of experience' },
-	{ value: '[4.9★]', label: 'Google rating' },
-	{ value: '[10,000+]', label: 'smiles treated' },
-	{ value: '[24h]', label: 'same-day emergency' },
-];
-
-const treatments = [
-	{ icon: 'toothCheck', title: 'Check-ups &amp;<br>Cleaning', href: routes.general },
-	{ icon: 'kids', title: "Children's<br>Dentistry", href: routes.general, featured: true },
-	{ icon: 'rootCanal', title: 'Root Canal<br>Treatment', href: `${routes.treatments}#rct` },
-	{ icon: 'implant', title: 'Dental<br>Implants', href: `${routes.treatments}#implants` },
-	{ icon: 'braces', title: 'Braces &amp;<br>Aligners', href: `${routes.treatments}#braces` },
-	{ icon: 'whitening', title: 'Whitening &amp;<br>Smile Design', href: routes.cosmetic },
-] as const;
-
-const credentials = [
-	{ strong: 'BDS, MDS in [Specialisation]', rest: ', [University]' },
-	{ strong: 'Certified in [Implantology]', rest: ', [Institute]' },
-	{ strong: 'Member', rest: ', [Indian Dental Association]' },
+	{ value: dentist.patients, label: 'Patients served' },
+	{ value: `${site.rating.value}★`, label: 'Google rating' },
+	{ value: dentist.years, label: 'Years experience' },
 ];
 
 const reasons = [
-	{ title: 'Spotless hygiene', text: 'Autoclaved, sealed instruments opened in front of you.' },
-	{ title: 'Modern technology', text: 'Digital X-rays and intraoral cameras for precise care.' },
-	{ title: 'Comfort first', text: 'Gentle numbing, longer slots, breaks whenever you need.' },
-	{ title: 'Clear pricing', text: 'Written estimates before treatment, EMI available.' },
-];
-
-const reviews = [
-	{ quote: '[Real Google review about a calm, painless first visit.]', name: '[Patient name]', meta: '[Root canal]', tone: 'soft' },
-	{ quote: "[Real Google review from a parent about their child's visit.]", name: '[Parent name]', meta: "Kids' dentistry", tone: 'blue' },
-	{ quote: '[Real Google review about implants or whitening results.]', name: '[Patient name]', meta: '[Implants]', tone: 'soft' },
+	{ icon: 'heart', title: 'Personalised treatment plans', text: 'Every plan is explained in plain language, with costs in writing before we begin.' },
+	{ icon: 'xray', title: 'Advanced dental technology', text: 'Digital X-rays, intraoral cameras and 3D scans for precise, gentle care.' },
+	{ icon: 'chair', title: 'Comfort-first experience', text: 'Unhurried appointments, gentle numbing and breaks whenever you need them.' },
 ] as const;
 
-const gallery = [
-	{ label: 'Treatment room', photo: photos.treatmentRoom, tall: true },
-	{ label: 'Reception', photo: photos.reception },
-	{ label: 'Sterilisation area', photo: photos.sterilisation },
-	{ label: 'Digital X-ray', photo: photos.digitalXray },
-	{ label: "Kids' corner", photo: photos.kidsDentist },
+const featured = ['teeth-whitening', 'veneers', 'clear-aligners', 'dental-implants', 'root-canal-treatment', 'check-up-and-cleaning']
+	.map(findTreatment)
+	.filter((t): t is Treatment => Boolean(t));
+
+const homeReviews = reviews.filter((r) => r.headline).slice(0, 3);
+
+const results = [
+	{ label: 'Teeth whitening', meta: '1 visit', pair: smileCases.whitening, href: treatmentHref('teeth-whitening') },
+	{ label: 'Porcelain veneers', meta: '3 visits', pair: smileCases.veneers, href: treatmentHref('veneers') },
+	{ label: 'Clear aligners', meta: '14 months', pair: smileCases.aligners, href: treatmentHref('clear-aligners') },
 ];
 
 const faqs = [
-	{ q: 'When should my child first see a dentist?', a: 'By their first birthday or when the first tooth appears.' },
-	{ q: 'Is root canal treatment painful?', a: 'With modern anaesthesia it feels much like a filling.' },
-	{ q: 'Can I book on WhatsApp?', a: 'Yes. Send your name, preferred day and reason for visit.' },
-	{ q: 'Do you offer EMI?', a: '[Add your payment policy here.]' },
+	{ q: 'Do you accept walk-ins and emergencies?', a: 'Yes. We keep same-day slots for pain, swelling and broken teeth. Call or WhatsApp us and we will fit you in.' },
+	{ q: 'How much does a first consultation cost?', a: 'A consultation with a full check-up is ₹500, adjusted against any treatment you go ahead with.' },
+	{ q: 'Can I book on WhatsApp?', a: 'Yes. Send your name, preferred day and reason for visit, and we confirm within two hours during clinic hours.' },
+	{ q: 'Do you offer EMI or insurance billing?', a: 'No-cost EMI is available on treatments over ₹10,000. We provide itemised invoices for insurance claims.' },
+	{ q: 'When should my child first see a dentist?', a: 'By their first birthday or when the first tooth appears. Early visits are short, playful and free of any treatment.' },
 ];
+
+const faqSchema = {
+	'@type': 'FAQPage',
+	mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+};
 ---
 
-<BaseLayout title={`${site.name} — Home`}>
-	<PageHero
-		home
-		titleId="hero-title"
-		title="Gentle dental care, brighter family smiles."
-		photo={photos.heroHome}
-		photoPosition="70% center"
-		padBottom="0"
-		active="home"
-	>
-		<div slot="top" class="badge-row">
-			<div class="badge">
-				<span class="faces" aria-hidden="true"><span></span><span></span><span></span></span>
-				<span class="badge-text"><strong>[10K+]</strong><span>Happy patients</span></span>
-				<span class="badge-check"><Icon name="check" size={12} strokeWidth={3.5} /></span>
-			</div>
-		</div>
-		<div class="intro">
-			<p class="intro-text">
-				From your child's first check-up to implants and smile makeovers, our experienced team gives every patient calm, unhurried, personal care.
-			</p>
-		</div>
-		<div class="hero-actions">
-			<a href={routes.contact} class="btn btn--blue">Book appointment</a>
-			<a href={site.whatsapp} class="wa-link">
-				<span class="wa-ring"><Icon name="whatsapp" size={18} strokeWidth={1.8} /></span>Chat on WhatsApp
-			</a>
-		</div>
-		<div slot="after" class="stats-gap">
-			<GlassStats items={stats} />
-		</div>
-	</PageHero>
+<BaseLayout
+	title={`${site.name} | Premium Family & Cosmetic Dentist in ${site.area}, ${site.city}`}
+	description={`${site.name} in ${site.area}, ${site.city}: gentle check-ups, painless root canals, implants, clear aligners and smile makeovers by ${dentist.name}. Rated ${site.rating.value}★ by ${site.rating.count} patients. Book online or on WhatsApp.`}
+	schema={[faqSchema]}
+>
+	<HomeHero
+		eyebrow={`Cosmetic & family dentistry · ${site.area}`}
+		title="Premium dental care, designed around your smile."
+		lead={`From your child's first check-up to implants and smile makeovers, ${site.name} offers modern, unhurried dentistry in ${site.area}, with comfort, precision and honesty at every step.`}
+		photo={photos.homeFeature}
+		stats={stats}
+		primary={{ label: 'Book your visit', href: `${routes.contact}#book` }}
+		secondary={{ label: 'Chat on WhatsApp', href: site.whatsapp }}
+		rating={{ value: site.rating.value, label: `${site.rating.count} Google reviews` }}
+	/>
 
-	<section aria-labelledby="about-title" class="section">
-		<div aria-hidden="true" class="blob home-blob"></div>
-		<div class="container split">
-			<div class="about-copy">
-				<p class="eyebrow">About us</p>
-				<h2 id="about-title" class="h2">Aster is a family dental clinic led by experienced, caring professionals</h2>
-				<p class="muted about-text">
-					We focus on prevention, honest advice and comfortable treatment. Every plan is explained in plain language, with costs in writing before we begin.
-				</p>
-				<a href={routes.about} class="text-link">Learn about the clinic<Icon name="arrow" size={16} strokeWidth={2.2} /></a>
-			</div>
-			<Photo label="Photo · Dental team treating a patient" photo={photos.teamTreating} height="320px" class="about-photo" />
-		</div>
-	</section>
-
-	<section aria-labelledby="tx-title" class="section section--flush-top">
-		<div class="container stack">
+	<section aria-labelledby="welcome-title" class="section bg-soft welcome">
+		<div class="container container--narrow">
 			<div class="section-head section-head--center">
-				<p class="eyebrow">Our treatments</p>
-				<h2 id="tx-title" class="h2">For Your Smile</h2>
-			</div>
-			<div class="card-grid">
-				{treatments.map((t) => <IconCard icon={t.icon} title={t.title} href={t.href} featured={'featured' in t && t.featured} tall />)}
-			</div>
-		</div>
-	</section>
-
-	<section aria-labelledby="dr-title" class="section bg-soft">
-		<div class="container split">
-			<div class="dr-media">
-				<Photo label="Photo · Portrait of Dr. [Name]" photo={photos.dentistPortrait} height="540px" position="center 20%" />
-				<div class="dr-card">
-					<span class="dr-name"><strong>Dr. [Full Name]</strong><span>BDS, MDS · [Specialisation]</span></span>
-					<span class="pill">[15+] yrs</span>
-				</div>
-			</div>
-			<div class="dr-copy">
-				<p class="eyebrow">Meet your dentist</p>
-				<h2 id="dr-title" class="h2">Expert hands, a gentle approach</h2>
-				<p class="muted">[2–3 lines on the dentist's training, focus areas and what patients love about them.]</p>
-				<ul class="checks">
-					{
-						credentials.map((c) => (
-							<li>
-								<span class="check-dot">
-									<Icon name="check" size={13} strokeWidth={3.5} />
-								</span>
-								<span>
-									<strong>{c.strong}</strong>
-									{c.rest}
-								</span>
-							</li>
-						))
-					}
-				</ul>
-				<a href={routes.dentist} class="btn btn--md btn--outline-blue dr-btn">View full profile</a>
+				<p class="eyebrow">Welcome to {site.name}</p>
+				<h2 id="welcome-title" class="h2">Elevated dentistry for healthier, brighter smiles</h2>
+				<hr class="rule" />
+				<p class="muted welcome-text">
+					Experience a new standard of dental care, where advanced clinical expertise meets a calm, beautifully designed space. Every
+					treatment is planned around you, to protect your oral health and give you a smile you are proud to share.
+				</p>
+				<a href={routes.about} class="btn btn--md btn--primary welcome-btn">Discover our approach</a>
 			</div>
 		</div>
 	</section>
 
 	<section aria-labelledby="why-title" class="section">
-		<div class="container">
-			<div class="panel-dark why">
-				<div class="why-head">
-					<p class="eyebrow eyebrow--light">Why choose us</p>
-					<h2 id="why-title" class="why-title">Care you can feel from the first visit</h2>
-					<a href={routes.contact} class="btn btn--md btn--white why-btn">Book a visit</a>
+		<div class="container split why">
+			<div class="why-media">
+				<span aria-hidden="true" class="why-block"></span>
+				<Photo label="Our treatment room" photo={photos.treatmentRoom} height="560px" radius="24px" class="why-photo" />
+				<div class="why-badge">
+					<strong>Since {site.founded}</strong>
+					<span>Caring for {site.area}</span>
 				</div>
-				<div class="why-grid">
+			</div>
+			<div class="why-copy">
+				<p class="eyebrow">Why choose us</p>
+				<h2 id="why-title" class="h2">Exceptional care, tailored to you</h2>
+				<p class="muted">
+					Our team works together so every part of your visit, from the first phone call to your final check, feels considered. Your comfort
+					and long-term health always come before the quickest fix.
+				</p>
+				<ul class="reasons">
 					{
 						reasons.map((r) => (
-							<div class="why-item">
-								<h3>{r.title}</h3>
-								<p>{r.text}</p>
-							</div>
+							<li>
+								<span class="reason-icon">
+									<Icon name={r.icon} size={22} strokeWidth={1.5} />
+								</span>
+								<span>
+									<strong>{r.title}</strong>
+									<span>{r.text}</span>
+								</span>
+							</li>
 						))
 					}
+				</ul>
+				<a href={routes.dentist} class="btn btn--md btn--primary why-btn">Meet the team</a>
+			</div>
+		</div>
+	</section>
+
+	<section aria-labelledby="tx-title" class="section bg-soft">
+		<div class="container stack">
+			<div class="section-head section-head--center">
+				<p class="eyebrow">Our expertise</p>
+				<h2 id="tx-title" class="h2">Comprehensive dentistry, tailored to you</h2>
+				<p class="muted">Clear pricing, honest advice and treatments planned around your goals.</p>
+			</div>
+			<div class="card-grid">
+				{featured.map((t) => <TreatmentCard treatment={t} />)}
+			</div>
+			<a href={routes.services} class="btn btn--outline all-btn">View all treatments</a>
+		</div>
+	</section>
+
+	<section aria-labelledby="dr-title" class="section">
+		<div class="container split">
+			<div class="dr-media">
+				<Photo label={`Portrait of ${dentist.name}`} photo={photos.dentistPortrait} height="600px" radius="28px" position="center 20%" />
+				<div class="dr-card">
+					<span class="dr-name"><strong>{dentist.name}</strong><span>{dentist.degrees}</span></span>
+					<span class="dr-stats">
+						<span><strong>{dentist.years}</strong> years</span>
+						<span><strong>{dentist.implants}</strong> implants</span>
+					</span>
+				</div>
+			</div>
+			<div class="dr-copy">
+				<p class="eyebrow">Meet your dentist</p>
+				<h2 id="dr-title" class="h2">Expert hands, a gentle approach</h2>
+				<p class="muted">{dentist.intro}</p>
+				<blockquote class="dr-quote">“{dentist.quote.split('. ')[0]}.”</blockquote>
+				<ul class="creds">
+					<li><Icon name="award" size={18} strokeWidth={1.6} />{dentist.degrees}</li>
+					<li><Icon name="shield" size={18} strokeWidth={1.6} />{dentist.registration}</li>
+					<li><Icon name="globe" size={18} strokeWidth={1.6} />Speaks {dentist.languages.join(', ')}</li>
+				</ul>
+				<div class="btn-row">
+					<a href={routes.dentist} class="btn btn--md btn--primary">View full profile</a>
+					<a href={`${routes.contact}#book`} class="btn btn--md btn--outline">Book with {dentist.shortName}</a>
 				</div>
 			</div>
 		</div>
 	</section>
 
-	<section aria-labelledby="rev-title" class="section section--flush-top">
+	<section aria-labelledby="rev-title" class="section trust">
 		<div class="container stack">
-			<div class="section-head section-head--center">
-				<p class="eyebrow">Testimonials</p>
-				<h2 id="rev-title" class="h2">What Our Patients Say</h2>
+			<div class="trust-head">
+				<div class="section-head">
+					<p class="eyebrow eyebrow--light">Patient stories</p>
+					<h2 id="rev-title" class="h2">Why patients trust {site.name}</h2>
+					<p class="trust-text">
+						{site.rating.count} patients have rated us {site.rating.value} out of 5 on Google. Here is what a few of them said.
+					</p>
+				</div>
+				<RatingSummary class="trust-summary" />
 			</div>
 			<div class="review-grid">
-				{reviews.map((r) => <ReviewCard quote={r.quote} name={r.name} meta={r.meta} tone={r.tone} featured />)}
+				{homeReviews.map((r) => <ReviewCard review={r} tone="dark" featured />)}
+			</div>
+			<div class="btn-row trust-actions">
+				<a href={routes.reviews} class="btn btn--white">Read all reviews</a>
+				<a href={site.googleReviews} class="btn btn--outline-white">See us on Google</a>
 			</div>
 		</div>
 	</section>
 
-	<section aria-labelledby="gal-title" class="section bg-soft">
+	<section aria-labelledby="results-title" class="section">
 		<div class="container stack" style="--stack-gap: 40px">
 			<div class="heading-row">
 				<div class="section-head">
-					<p class="eyebrow">Our clinic</p>
-					<h2 id="gal-title" class="h2">Clean, calm and modern</h2>
+					<p class="eyebrow">Smile gallery</p>
+					<h2 id="results-title" class="h2">Real changes, natural results</h2>
 				</div>
-				<a href={routes.about} class="text-link">Explore facilities</a>
+				<a href={`${routes.reviews}#gallery`} class="text-link">See the full gallery<Icon name="arrow" size={16} strokeWidth={2} /></a>
 			</div>
 			<div class="gallery">
-				{gallery.map((g) => <Photo label={g.label} photo={g.photo} caption radius="16px" class={g.tall ? 'tall' : undefined} />)}
+				{results.map((r) => <BeforeAfter label={r.label} meta={r.meta} pair={r.pair} height="200px" />)}
 			</div>
 		</div>
 	</section>
 
-	<section aria-labelledby="faq-title" class="section">
-		<div class="container container--narrow stack" style="--stack-gap: 40px">
-			<div class="section-head section-head--center">
+	<section aria-labelledby="faq-title" class="section bg-soft">
+		<div class="container faq-split">
+			<div class="section-head faq-head">
 				<p class="eyebrow">FAQ</p>
-				<h2 id="faq-title" class="h2">Common Questions</h2>
+				<h2 id="faq-title" class="h2">Questions, answered honestly</h2>
+				<p class="muted">Can't find what you're looking for? Message us on WhatsApp and a real person will reply.</p>
+				<a href={site.whatsapp} class="text-link"><Icon name="whatsapp" size={18} strokeWidth={1.8} />Ask on WhatsApp</a>
 			</div>
 			<FaqList items={faqs} />
 		</div>
 	</section>
 
-	<section aria-labelledby="visit-title" class="section section--flush-top">
+	<section aria-labelledby="visit-title" class="section">
 		<div class="container visit">
 			<MapPlaceholder class="visit-map" />
 			<div class="visit-card">
+				<p class="eyebrow">Location</p>
 				<h2 id="visit-title" class="visit-title">Visit the clinic</h2>
 				<OpenStatus />
-				<p class="visit-address">[Building, Street]<br />[Area], {site.city} [PIN]</p>
+				<p class="visit-address">{site.street}<br />{site.area}, {site.city} {site.postalCode}</p>
 				<dl class="visit-list">
-					<dt>Mon – Sat</dt><dd>[10:00 – 20:00]</dd>
-					<dt>Sunday</dt><dd>[Emergencies only]</dd>
+					{
+						site.hours.map(([day, time]) => (
+							<>
+								<dt>{day}</dt>
+								<dd>{time}</dd>
+							</>
+						))
+					}
 					<dt>Phone</dt><dd><a href={site.phoneHref}>{site.phoneDisplay}</a></dd>
 				</dl>
-				<a href={site.maps} class="btn btn--md btn--blue visit-btn">Get directions</a>
+				<a href={site.maps} class="btn btn--md btn--primary visit-btn"><Icon name="pin" size={18} strokeWidth={1.6} />Get directions</a>
 			</div>
 		</div>
 	</section>
 
 	<CtaBand
 		title="Ready for a healthier smile?"
-		text="Book online or on WhatsApp. We confirm within [2 hours]."
-		primary={{ label: 'Book appointment', href: routes.contact }}
+		text={`Book online or on WhatsApp. We confirm every request within ${site.confirmWithin}.`}
+		primary={{ label: 'Book appointment', href: `${routes.contact}#book` }}
 		secondary={{ label: 'WhatsApp us', href: site.whatsapp }}
 	/>
 </BaseLayout>
 
 <style>
-	/* Hero */
-	.badge-row {
-		display: flex;
-		justify-content: flex-end;
-	}
-	.badge {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-		padding: 8px 16px 8px 8px;
-		border-radius: 999px;
-		background: rgba(255, 255, 255, 0.85);
-	}
-	.faces {
-		display: flex;
-	}
-	.faces span {
-		width: 34px;
-		height: 34px;
-		border-radius: 50%;
-		border: 2px solid var(--white);
-		background: var(--avatar);
-	}
-	.faces span + span {
-		margin-left: -10px;
-	}
-	.faces span:nth-child(2) {
-		background: #9fbcdb;
-	}
-	.faces span:nth-child(3) {
-		background: #86a9cf;
-	}
-	.badge-text {
-		display: flex;
-		flex-direction: column;
-		line-height: 1.15;
-	}
-	.badge-text strong {
+	/* Welcome */
+	.welcome-text {
+		margin-top: 8px;
 		font-size: 17px;
-		color: var(--ink);
 	}
-	.badge-text span {
-		font-size: 12px;
-		color: #4a6683;
-	}
-	.badge-check {
-		width: 22px;
-		height: 22px;
-		border-radius: 50%;
-		background: var(--blue);
-		color: var(--white);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-	}
-	.intro {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 16px 56px;
-		max-width: 640px;
-	}
-	.intro-text {
-		flex: 1 1 320px;
-		color: var(--on-dark);
-		font-size: 16px;
-	}
-	.hero-actions {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 14px;
-		align-items: center;
-	}
-	.wa-link {
-		display: inline-flex;
-		align-items: center;
-		gap: 12px;
-		min-height: 52px;
-		color: var(--white);
-		text-decoration: none;
-		font-weight: 600;
-		font-size: 15px;
-	}
-	.wa-link:hover {
-		color: var(--white);
-	}
-	.wa-ring {
-		width: 40px;
-		height: 40px;
-		border-radius: 50%;
-		border: 1.5px solid var(--white);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: background-color 0.15s ease;
-	}
-	.wa-link:hover .wa-ring {
-		background: rgba(255, 255, 255, 0.15);
-	}
-	.stats-gap {
-		margin-top: 48px;
+	.welcome-btn {
+		margin-top: 16px;
 	}
 
-	/* About */
-	.home-blob {
-		right: -120px;
-		top: -40px;
-		width: 620px;
-		height: 560px;
+	/* Why choose us */
+	.why-media {
+		flex: 1 1 420px;
+		position: relative;
+		padding: 0 32px 32px 0;
 	}
-	.about-copy {
-		flex: 1 1 460px;
+	.why-block {
+		position: absolute;
+		inset: 48px 0 0 48px;
+		border-radius: 28px;
+		background: var(--soft);
+	}
+	.why-media :global(.why-photo) {
+		position: relative;
+	}
+	.why-badge {
+		position: absolute;
+		right: 0;
+		bottom: 64px;
+		padding: 18px 22px;
+		border-radius: 18px;
+		background: var(--dark);
+		color: var(--white);
 		display: flex;
 		flex-direction: column;
+		line-height: 1.3;
+		box-shadow: var(--shadow-card);
+	}
+	.why-badge strong {
+		font-family: var(--font-display);
+		font-size: 22px;
+		font-weight: 500;
+	}
+	.why-badge span {
+		font-size: 13px;
+		color: var(--on-dark-2);
+	}
+	.why-copy {
+		flex: 1 1 440px;
+		display: flex;
+		flex-direction: column;
+		gap: 18px;
+	}
+	.reasons {
+		margin: 8px 0 0;
+		padding: 0;
+		list-style: none;
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+	.reasons li {
+		display: flex;
 		gap: 16px;
+		align-items: flex-start;
+		padding: 18px 20px;
+		border-radius: 18px;
+		background: var(--white);
+		border: 1px solid var(--line-2);
 	}
-	.about-text {
-		margin-top: 24px;
-		max-width: 30em;
+	.reasons li > span:last-child {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
 	}
-	.about-copy .text-link {
+	.reasons strong {
+		font-weight: 600;
+	}
+	.reasons li > span:last-child > span {
+		font-size: 15px;
+		color: var(--muted);
+	}
+	.reason-icon {
+		flex: 0 0 44px;
+		height: 44px;
+		border-radius: 50%;
+		background: var(--tint);
+		color: var(--accent);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	.why-btn {
 		align-self: flex-start;
 		margin-top: 8px;
 	}
-	.split :global(.about-photo) {
-		flex: 1 1 420px;
-	}
 
+	/* Treatments */
 	.card-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
-		gap: 20px;
+		grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+		gap: 24px;
+	}
+	.all-btn {
+		align-self: center;
 	}
 
 	/* Dentist */
 	.dr-media {
 		flex: 1 1 420px;
 		position: relative;
+		max-width: 560px;
 	}
 	.dr-card {
 		position: absolute;
-		left: 24px;
-		right: 24px;
-		bottom: 24px;
-		background: var(--white);
-		border-radius: 14px;
+		left: 20px;
+		right: 20px;
+		bottom: 20px;
 		padding: 18px 22px;
+		border-radius: 20px;
+		background: rgba(255, 255, 255, 0.94);
+		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
 		display: flex;
+		flex-wrap: wrap;
 		justify-content: space-between;
 		align-items: center;
-		gap: 16px;
-		box-shadow: 0 16px 36px -18px rgba(31, 59, 91, 0.45);
+		gap: 12px 20px;
+		box-shadow: var(--shadow-card);
 	}
 	.dr-name {
 		display: flex;
 		flex-direction: column;
-		line-height: 1.3;
+		line-height: 1.35;
 	}
 	.dr-name strong {
-		font-size: 18px;
+		font-family: var(--font-display);
+		font-size: 20px;
+		font-weight: 500;
 	}
 	.dr-name span {
-		font-size: 14px;
+		font-size: 13px;
 		color: var(--muted);
 	}
-	.dr-card .pill {
-		align-self: center;
+	.dr-stats {
+		display: flex;
+		gap: 16px;
 		font-size: 13px;
-		padding: 6px 12px;
-		white-space: nowrap;
+		color: var(--muted);
+	}
+	.dr-stats strong {
+		color: var(--ink);
+		font-size: 16px;
 	}
 	.dr-copy {
 		flex: 1 1 460px;
 		display: flex;
 		flex-direction: column;
-		gap: 18px;
+		gap: 20px;
 	}
-	.checks {
-		margin: 8px 0 0;
+	.dr-quote {
+		padding-left: 20px;
+		border-left: 2px solid var(--accent-soft);
+		font-family: var(--font-display);
+		font-size: 20px;
+		line-height: 1.45;
+		color: var(--body-2);
+	}
+	.creds {
+		margin: 0;
 		padding: 0;
 		list-style: none;
 		display: flex;
 		flex-direction: column;
-		gap: 14px;
+		gap: 10px;
+		font-size: 15px;
 	}
-	.checks li {
-		display: flex;
-		gap: 14px;
-		align-items: flex-start;
-	}
-	.check-dot {
-		flex: 0 0 26px;
-		height: 26px;
-		border-radius: 50%;
-		background: var(--blue);
-		color: var(--white);
+	.creds li {
 		display: flex;
 		align-items: center;
-		justify-content: center;
+		gap: 12px;
 	}
-	.dr-btn {
-		align-self: flex-start;
-		margin-top: 10px;
+	.creds :global(svg) {
+		flex: none;
+		color: var(--accent);
 	}
 
-	/* Why */
-	.why {
+	/* Reviews */
+	.trust {
+		background: var(--dark);
+		color: var(--white);
+	}
+	.trust-head {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 40px 64px;
+		justify-content: space-between;
+		align-items: flex-end;
+		gap: 32px;
 	}
-	.why-head {
-		flex: 1 1 320px;
-		min-width: 0;
-		display: flex;
-		flex-direction: column;
-		gap: 16px;
+	.trust-head .section-head {
+		flex: 1 1 420px;
 	}
-	.why-title {
-		font-weight: 700;
-		font-size: clamp(32px, 3.4vw, 44px);
-		line-height: 1.15;
-	}
-	.why-btn {
-		align-self: flex-start;
-		margin-top: 12px;
-		color: var(--navy);
-	}
-	.why-grid {
-		flex: 2 1 560px;
-		min-width: 0;
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
-		gap: 32px 40px;
-	}
-	.why-item {
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-		padding-top: 20px;
-		border-top: 1px solid var(--navy-line);
-	}
-	.why-item h3 {
-		font-size: 20px;
-		font-weight: 700;
-	}
-	.why-item p {
+	.trust-text {
 		color: var(--on-dark-2);
-		font-size: 16px;
+		max-width: 30em;
 	}
-
+	.trust-head :global(.trust-summary) {
+		flex: 0 1 460px;
+		color: var(--ink);
+	}
 	.review-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
 		gap: 20px;
 	}
+	.review-grid :global(.review.dark) {
+		background: var(--dark-card);
+	}
+	.trust-actions {
+		justify-content: center;
+	}
 
+	/* Results */
 	.gallery {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
-		grid-auto-rows: 230px;
-		gap: 16px;
+		grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+		gap: 20px;
 	}
-	.gallery :global(.tall) {
-		grid-row: span 2;
+	.gallery :global(.case) {
+		border: 1px solid var(--line-2);
+	}
+
+	/* FAQ */
+	.faq-split {
+		display: grid;
+		grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+		gap: 40px clamp(40px, 6vw, 96px);
+		align-items: start;
+	}
+	.faq-head .text-link {
+		align-self: flex-start;
+	}
+	@media (max-width: 860px) {
+		.faq-split {
+			grid-template-columns: minmax(0, 1fr);
+		}
 	}
 
 	/* Visit */
@@ -521,16 +509,18 @@ const faqs = [
 	.visit-card {
 		flex: 1 1 380px;
 		min-width: 0;
-		border-radius: 18px;
-		background: var(--soft);
-		padding: clamp(28px, 4vw, 40px);
+		border-radius: 24px;
+		background: var(--white);
+		border: 1px solid var(--line-2);
+		padding: clamp(28px, 4vw, 44px);
 		display: flex;
 		flex-direction: column;
-		gap: 22px;
+		gap: 18px;
 	}
 	.visit-title {
-		font-weight: 700;
-		font-size: 32px;
+		font-weight: 500;
+		font-size: 34px;
+		letter-spacing: -0.02em;
 	}
 	.visit-address {
 		color: var(--body-2);
@@ -539,12 +529,13 @@ const faqs = [
 		display: grid;
 		grid-template-columns: auto 1fr;
 		gap: 8px 24px;
+		font-size: 15px;
 	}
 	.visit-list dt {
 		color: var(--muted);
 	}
 	.visit-list dd {
-		font-weight: 700;
+		font-weight: 600;
 	}
 	.visit-list a {
 		color: var(--ink);
@@ -552,5 +543,20 @@ const faqs = [
 	}
 	.visit-btn {
 		align-self: flex-start;
+	}
+
+	@media (max-width: 560px) {
+		.why-media {
+			padding: 0 16px 16px 0;
+		}
+		.why-block {
+			inset: 32px 0 0 32px;
+		}
+		.why-media :global(.why-photo) {
+			height: 420px !important;
+		}
+		.dr-media :global(.photo) {
+			height: 480px !important;
+		}
 	}
 </style>

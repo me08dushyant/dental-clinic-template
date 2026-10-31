@@ -3,40 +3,60 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import GlassStats from '../components/GlassStats.astro';
 import ReviewCard from '../components/ReviewCard.astro';
+import RatingSummary from '../components/RatingSummary.astro';
 import BeforeAfter from '../components/BeforeAfter.astro';
-import { routes, site } from '../data/site';
+import Icon from '../components/Icon.astro';
+import { routes, site, treatmentHref } from '../data/site';
 import { photos, smileCases } from '../data/photos';
+import { reviews } from '../data/reviews';
 
 const ratings = [
-	{ value: '[4.9★]', label: 'Google rating' },
-	{ value: '[000]', label: 'Google reviews' },
-	{ value: '[4.8★]', label: '[Practo] rating' },
+	{ value: `${site.rating.value}★`, label: 'Google rating' },
+	{ value: site.rating.count, label: 'Google reviews' },
+	{ value: '4.8★', label: 'Practo rating' },
 ];
 
-const reviews = [
-	{ quote: '[Longer featured review from Google, ideally about overcoming dental anxiety.]', name: '[Patient name]', meta: '[Treatment] · [Month Year]', tone: 'blue', featured: true },
-	{ quote: "[Short review about a child's first visit.]", name: '[Parent name]', meta: "Kids' dentistry", tone: 'soft' },
-	{ quote: '[Review about root canal treatment and how quickly the pain went away.]', name: '[Patient name]', meta: 'Root canal', tone: 'outline' },
-	{ quote: '[Review mentioning how clean the clinic is.]', name: '[Patient name]', meta: 'Cleaning', tone: 'outline' },
-	{ quote: '[Review about dental implants and the final result.]', name: '[Patient name]', meta: 'Implants', tone: 'navy' },
-	{ quote: '[Review about whitening or veneers.]', name: '[Patient name]', meta: 'Cosmetic', tone: 'soft' },
-	{ quote: '[Review about clear explanations and transparent pricing.]', name: '[Patient name]', meta: 'Consultation', tone: 'outline' },
-] as const;
+const filters = ['All', ...new Set(reviews.map((r) => r.treatment))];
+const featured = reviews.filter((r) => r.headline);
+const rest = reviews.filter((r) => !r.headline);
 
 const results = [
-	{ label: 'Whitening', pair: smileCases.whitening },
-	{ label: 'Veneers', pair: smileCases.veneers },
-	{ label: 'Clear aligners', pair: smileCases.aligners },
-	{ label: 'Dental implant', pair: smileCases.implant },
-	{ label: 'Bonding', pair: smileCases.bonding },
-	{ label: 'Crowns', pair: smileCases.crowns },
+	{ label: 'Whitening', meta: '1 visit', pair: smileCases.whitening, href: treatmentHref('teeth-whitening') },
+	{ label: 'Veneers', meta: '3 visits', pair: smileCases.veneers, href: treatmentHref('veneers') },
+	{ label: 'Clear aligners', meta: '14 months', pair: smileCases.aligners, href: treatmentHref('clear-aligners') },
+	{ label: 'Dental implant', meta: '4 months', pair: smileCases.implant, href: treatmentHref('dental-implants') },
+	{ label: 'Bonding', meta: '1 visit', pair: smileCases.bonding, href: treatmentHref('veneers') },
+	{ label: 'Crowns', meta: '2 visits', pair: smileCases.crowns, href: treatmentHref('crowns-and-bridges') },
+];
+
+const schema = [
+	{
+		'@type': 'ItemList',
+		name: `${site.name} patient reviews`,
+		itemListElement: reviews.map((r, i) => ({
+			'@type': 'ListItem',
+			position: i + 1,
+			item: {
+				'@type': 'Review',
+				author: { '@type': 'Person', name: r.name },
+				reviewRating: { '@type': 'Rating', ratingValue: r.rating, bestRating: 5 },
+				reviewBody: r.quote,
+				itemReviewed: { '@id': new URL('/#clinic', Astro.site).href },
+			},
+		})),
+	},
 ];
 ---
 
-<BaseLayout title={`Patient Reviews — ${site.name}`}>
+<BaseLayout
+	title={`Patient Reviews & Smile Gallery | ${site.name}, ${site.city}`}
+	description={`Rated ${site.rating.value}★ from ${site.rating.count} Google reviews. Read what patients say about root canals, implants, aligners and kids' visits at ${site.name}, ${site.area}, and see before-and-after results.`}
+	crumbs={[{ label: 'Reviews' }]}
+	schema={schema}
+>
 	<PageHero
 		title="In our patients' words."
-		lead="Real reviews from families we care for, shared on Google and [Practo]."
+		lead="Real experiences from families we care for, shared on Google and Practo."
 		photo={photos.heroReviews}
 		photoPosition="70% 35%"
 		padBottom="48px"
@@ -48,28 +68,47 @@ const results = [
 
 	<section aria-labelledby="list-title" class="section">
 		<div class="container stack" style="--stack-gap: 40px">
-			<div class="section-head section-head--center">
-				<p class="eyebrow">Testimonials</p>
-				<h2 id="list-title" class="h2">What Our Patients Say</h2>
+			<div class="intro">
+				<div class="section-head">
+					<p class="eyebrow">Testimonials</p>
+					<h2 id="list-title" class="h2">What our patients say</h2>
+					<p class="muted">Most patients find us through a friend. Here is why they keep coming back, and bring their families.</p>
+				</div>
+				<RatingSummary class="intro-summary" />
 			</div>
-			<div class="masonry">
-				{reviews.map((r) => <ReviewCard quote={r.quote} name={r.name} meta={r.meta} tone={r.tone} featured={'featured' in r && r.featured} />)}
+
+			<div class="featured">
+				{featured.map((r, i) => <ReviewCard review={r} tone={i === 0 ? 'dark' : 'soft'} featured />)}
 			</div>
-			<a href={site.googleReviews} class="btn btn--outline-blue more">Read more on Google</a>
+
+			<div class="filters" role="group" aria-label="Filter reviews by treatment" data-filters>
+				{filters.map((f, i) => <button type="button" class="filter" aria-pressed={i === 0 ? 'true' : 'false'} data-filter={f}>{f}</button>)}
+			</div>
+			<div class="masonry" data-reviews>
+				{reviews.map((r) => <ReviewCard review={r} />)}
+			</div>
+			<p class="empty muted" hidden data-empty>No reviews for this treatment yet.</p>
+			<a href={site.googleReviews} class="btn btn--outline more">Read all {site.rating.count} reviews on Google</a>
 		</div>
 	</section>
 
-	<section aria-labelledby="gal-title" class="section bg-soft">
+	<section id="gallery" aria-labelledby="gal-title" class="section bg-soft">
 		<div class="container stack" style="--stack-gap: 40px">
 			<div class="heading-row">
 				<div class="section-head">
 					<p class="eyebrow">Smile gallery</p>
-					<h2 id="gal-title" class="h2">Before &amp; After Results</h2>
+					<h2 id="gal-title" class="h2">Before &amp; after results</h2>
 				</div>
 				<p class="muted consent">Sample images for illustration. Replace with the clinic's own cases, shared with each patient's written consent.</p>
 			</div>
 			<div class="results">
-				{results.map((r) => <BeforeAfter label={r.label} pair={r.pair} height="170px" />)}
+				{
+					results.map((r) => (
+						<a href={r.href} class="result">
+							<BeforeAfter label={r.label} meta={r.meta} pair={r.pair} height="180px" />
+						</a>
+					))
+				}
 			</div>
 		</div>
 	</section>
@@ -78,39 +117,124 @@ const results = [
 		<div class="container ctas">
 			<div class="cta-card cta-card--dark">
 				<h2 id="leave-title" class="cta-title">Ready for your own result?</h2>
-				<p>Start with a check-up and a clear plan.</p>
-				<a href={routes.contact} class="btn btn--white dark-btn">Book appointment</a>
+				<p>Start with a check-up and a clear, written plan.</p>
+				<a href={`${routes.contact}#book`} class="btn btn--white">Book appointment</a>
 			</div>
 			<div class="cta-card cta-card--outline">
 				<h2 class="cta-title">Already a patient?</h2>
-				<p class="muted">A quick review helps other families find gentle dental care.</p>
-				<a href={site.googleReviews} class="btn btn--blue">Leave a Google review</a>
+				<p class="muted">A quick review helps other families find gentle dental care. It takes under a minute.</p>
+				<a href={site.googleReviews} class="btn btn--primary"><Icon name="star" size={18} strokeWidth={1.6} />Leave a Google review</a>
 			</div>
 		</div>
 	</section>
 </BaseLayout>
 
+<script>
+	// Treatment filter chips: show only the matching review cards
+	const group = document.querySelector<HTMLElement>('[data-filters]');
+	const cards = document.querySelectorAll<HTMLElement>('[data-reviews] [data-treatment]');
+	const empty = document.querySelector<HTMLElement>('[data-empty]');
+
+	group?.addEventListener('click', (event) => {
+		const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-filter]');
+		if (!button) return;
+		const filter = button.dataset.filter;
+		group.querySelectorAll('[data-filter]').forEach((b) => b.setAttribute('aria-pressed', String(b === button)));
+		let shown = 0;
+		cards.forEach((card) => {
+			const match = filter === 'All' || card.dataset.treatment === filter;
+			card.hidden = !match;
+			if (match) shown++;
+		});
+		if (empty) empty.hidden = shown > 0;
+	});
+</script>
+
 <style>
+	.intro {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: flex-end;
+		gap: 32px;
+	}
+	.intro .section-head {
+		flex: 1 1 380px;
+	}
+	.intro :global(.intro-summary) {
+		flex: 0 1 480px;
+	}
+	.featured {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+		gap: 20px;
+	}
+	.filters {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		padding-top: 8px;
+	}
+	.filter {
+		min-height: 40px;
+		padding: 0 16px;
+		border-radius: 999px;
+		border: 1px solid var(--line);
+		background: var(--white);
+		font-size: 14px;
+		font-weight: 500;
+		cursor: pointer;
+		transition:
+			background-color 0.15s ease,
+			color 0.15s ease;
+	}
+	.filter:hover {
+		border-color: var(--primary);
+	}
+	.filter[aria-pressed='true'] {
+		background: var(--primary);
+		border-color: var(--primary);
+		color: var(--white);
+	}
 	.masonry {
-		columns: 3 320px;
+		columns: 3 300px;
 		column-gap: 20px;
 	}
 	.masonry > :global(figure) {
 		break-inside: avoid;
 		margin-bottom: 20px;
 	}
+	.masonry > :global(figure[hidden]) {
+		display: none;
+	}
+	.empty {
+		text-align: center;
+	}
 	.more {
 		align-self: center;
 	}
 
 	.consent {
-		font-size: 15px;
+		font-size: 14px;
 		max-width: 28em;
 	}
 	.results {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
 		gap: 20px;
+	}
+	.result {
+		color: var(--ink);
+		text-decoration: none;
+		border-radius: 18px;
+		transition:
+			transform 0.2s ease,
+			box-shadow 0.2s ease;
+	}
+	.result:hover {
+		color: var(--ink);
+		transform: translateY(-3px);
+		box-shadow: var(--shadow-card);
 	}
 	.results :global(.case) {
 		padding: 12px;
@@ -124,28 +248,27 @@ const results = [
 	}
 	.cta-card {
 		padding: clamp(32px, 4vw, 48px);
-		border-radius: 20px;
+		border-radius: 24px;
 		display: flex;
 		flex-direction: column;
 		gap: 16px;
 		align-items: flex-start;
 	}
 	.cta-card--dark {
-		background: var(--navy);
+		background: var(--dark);
 		color: var(--white);
 	}
 	.cta-card--dark p {
 		color: var(--on-dark-2);
 	}
 	.cta-card--outline {
-		border: 1px solid var(--line);
+		background: var(--white);
+		border: 1px solid var(--line-2);
 	}
 	.cta-title {
-		font-weight: 700;
+		font-weight: 500;
 		font-size: clamp(26px, 2.8vw, 36px);
 		line-height: 1.15;
-	}
-	.dark-btn {
-		color: var(--navy);
+		letter-spacing: -0.02em;
 	}
 </style>
